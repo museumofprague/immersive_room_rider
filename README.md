@@ -16,16 +16,19 @@ In case you can't output NDI, you can use Spout:
 * https://spout.zeal.co/
 We provide Spout to NDI proxy to send the Spout texture to Media server. 
 
-### How to record video
-Download [NewTek SHQ7 codec]([https://pixera.one/en/](https://www.vizrt.com/support/product-updates/codecs-utilities/newtek-codec-for-windows/)).
+### Pre-render video
 
-Download [NDI Tools](https://ndi.video/tools/)
+#### Capture NDI / Spout stream
+You can use free [OBS software](https://obsproject.com/) along with [NDI plugin for OBS](https://github.com/DistroAV/DistroAV/releases) to record NDI streams. Better yet, OBS also supports the direct Spout capture.
 
-Output NDI stream from your application, use NDI Tools Studio Monitor to save the stream to disk. Use ffmpeg to convert from SHQ7 codec to HAP. Send us video in HAP format.
+You can also download [NDI Tools](https://ndi.video/tools/). NDI Tools should already include the [NewTek SHQ7 codec]([https://pixera.one/en/](https://www.vizrt.com/support/product-updates/codecs-utilities/newtek-codec-for-windows/)). Output NDI stream from your application, use NDI Tools Studio Monitor to save the stream to disk (it will save it in .mov SHQ7 codec).
 
+Unfortunetly, FFmpeg’s built-in SpeedHQ decoder does NOT support SHQ7 (YUVA422P with alpha, 10-bit-ish NewTek variant). So altought you can encode to HAP with ffmpeg, you can't decode .mov SHQ7 saved from NDI Tools Studio Monitor. For that you will need 3rd party paid plugin such as AfterCodecs for AE. 
+
+#### Convert Video to HAP codec
 HAP codec can be included in ffmpeg build or using 3rd party paid plugins such as AfterCodecs for Adobe After Effects. See more [here](https://hap.video/using-hap.html).
 
-On Windows you can check if your current ffmpeg build support HAP codec with  `ffmpeg -encoders | findstr /i hap`. Example terminal output on Windows: `V.S..D hap  Vidvox Hap`. Or on Linux / MacOS you can check with `ffmpeg -encoders | grep hap`.
+On Windows you can check if your current ffmpeg build support HAP codec with  `ffmpeg -encoders | findstr /i hap`. Example terminal output on Windows: `V.S..D hap  Vidvox Hap`. Or on Linux / MacOS you can check with `ffmpeg -encoders | grep hap`. To converrt the video to HAP use command `ffmpeg -i input.mov -c:v hap output.mov` or `ffmpeg -i yourSourceFile.mov -c:v hap -format hap_q outputName.mov`.
 
 ## Audio
 We have 12.4 2D speaker layout but we are effectively using 12.1 (all 4 subwoofers are fed from single audio source). 
@@ -42,3 +45,7 @@ WIP
 
 * Touchdesigner
 * Processing
+
+
+#### Notes
+* [Java Wrapper for NDI](https://github.com/WalkerKnapp/devolay)
