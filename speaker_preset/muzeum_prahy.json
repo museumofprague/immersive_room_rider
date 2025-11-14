@@ -1,0 +1,223 @@
+{
+  "lenght": 18000,
+  "centroid": [
+    9000,
+    3499
+  ],
+  "speakers": [
+    {
+      "coordinates": [
+        -9000,
+        3499
+      ],
+      "channel": "right rear 2",
+      "index": 34,
+      "position_normalized": [
+        -1,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        -5016,
+        3499
+      ],
+      "channel": "right rear 1",
+      "index": 33,
+      "position_normalized": [
+        -0.5573333501815796,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        -2170,
+        3499
+      ],
+      "channel": "right sub rear",
+      "index": 41,
+      "lfe": true,
+      "position_normalized": [
+        -0.24111109972000122,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        -1800,
+        3499
+      ],
+      "channel": "right rear 0",
+      "index": 32,
+      "position_normalized": [
+        -0.19999998807907104,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        1800,
+        3499
+      ],
+      "channel": "right side",
+      "index": 31,
+      "position_normalized": [
+        0.20000004768371582,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        5030,
+        3499
+      ],
+      "channel": "right sub front",
+      "index": 41,
+      "lfe": true,
+      "position_normalized": [
+        0.5588889122009277,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        5400,
+        3499
+      ],
+      "channel": "right front 0",
+      "index": 30,
+      "position_normalized": [
+        0.6000000238418579,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        9000,
+        3499
+      ],
+      "channel": "right front 1",
+      "index": 29,
+      "position_normalized": [
+        1,
+        0.3887777328491211,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        9000,
+        -3499
+      ],
+      "channel": "left front 1",
+      "index": 40,
+      "position_normalized": [
+        1,
+        -0.38877779245376587,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        5400,
+        -3499
+      ],
+      "channel": "left front 0",
+      "index": 39,
+      "position_normalized": [
+        0.6000000238418579,
+        -0.38877779245376587,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        5030,
+        -3499
+      ],
+      "channel": "left sub front",
+      "index": 41,
+      "lfe": true,
+      "position_normalized": [
+        0.5588889122009277,
+        -0.38877779245376587,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        1800,
+        -3499
+      ],
+      "channel": "left  side",
+      "index": 38,
+      "position_normalized": [
+        0.20000004768371582,
+        -0.38877779245376587,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        -1800,
+        -3499
+      ],
+      "channel": "left rear 0",
+      "index": 37,
+      "position_normalized": [
+        -0.19999998807907104,
+        -0.38877779245376587,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        -2170,
+        -3499
+      ],
+      "channel": "left sub rear",
+      "index": 41,
+      "lfe": true,
+      "position_normalized": [
+        -0.24111109972000122,
+        -0.38877779245376587,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        -5750,
+        -3499
+      ],
+      "channel": "left rear 1",
+      "index": 36,
+      "position_normalized": [
+        -0.6388888955116272,
+        -0.38877779245376587,
+        0
+      ]
+    },
+    {
+      "coordinates": [
+        -9000,
+        -3499
+      ],
+      "channel": "left rear 2",
+      "index": 35,
+      "position_normalized": [
+        -1,
+        -0.38877779245376587,
+        0
+      ]
+    }
+  ],
+  "name": "12.4 Muzeum Prahy 2D",
+  "width": 6998
+}
