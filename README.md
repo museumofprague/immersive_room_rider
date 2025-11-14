@@ -28,8 +28,9 @@ Unfortunetly, FFmpeg’s built-in SpeedHQ decoder does NOT support SHQ7 (YUVA422
 ##### OBS
 You can use free [OBS software](https://obsproject.com/) along with [NDI plugin for OBS](https://github.com/DistroAV/DistroAV/releases) to record NDI streams. Better yet, OBS also supports the direct Spout capture. Unfortunetly, you might be limited by avaliable max resolution inside OBS based on current diplay setting and GPU.
 
-##### LightJams Spout Recorder
-Another option is to use [LightJams Spout recorder](https://www.lightjams.com/spout-recorder.html) for capturing Spout stream. 
+##### Spout Recording only
+* Another option is to use [LightJams Spout recorder](https://www.lightjams.com/spout-recorder.html) for capturing Spout stream. 
+* One more worth looking into is open source [SpoutRecorder](https://github.com/leadedge/SpoutRecorder/). 
 
 #### Convert Video to HAP codec
 
