@@ -31,3 +31,9 @@ Speaker positions are provided in normalized coordinates from -1 to +1 with a ce
 * https://github.com/museumofprague/immersive_room_rider/blob/main/speaker_preset/muzeum_prahy.json 
 
 We can provide you with spatial audio realtime engine. The system expects OSC messages with virtual audio sources positions and it will calculate needed volumes for all speakers to create an illusion of the sound coming from given direction. 
+
+## Templates
+WIP
+
+* Touchdesigner
+* Processing
