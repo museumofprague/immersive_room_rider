@@ -23,6 +23,8 @@ Download [NDI Tools](https://ndi.video/tools/)
 
 Output NDI stream from your application, use NDI Tools Studio Monitor to save the stream to disk. Use ffmpeg to convert from SHQ7 codec to HAP. Send us video in HAP format.
 
+HAP codec can be included in ffmpeg build or using 3rd party paid plugins such as AfterCodecs for Adobe After Effects. See more [here](https://hap.video/using-hap.html).
+
 ## Audio
 We have 12.4 2D speaker layout but we are effectively using 12.1 (all 4 subwoofers are fed from single audio source). 
 Speaker positions are provided in normalized coordinates from -1 to +1 with a centroid at (0,0). 
