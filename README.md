@@ -27,5 +27,7 @@ Output NDI stream from your application, use NDI Tools Studio Monitor to save th
 
 ## Audio
 We have 12.4 2D speaker layout but we are effectively using 12.1 (all 4 subwoofers are fed from single audio source). 
-
 Speaker positions are provided in normalized coordinates from -1 to +1 with a centroid at (0,0). 
+* https://github.com/museumofprague/immersive_room_rider/blob/main/speaker_preset/muzeum_prahy.json 
+
+We can provide you with spatial audio realtime engine. The system expects OSC messages with virtual audio sources positions and it will calculate needed volumes for all speakers to create an illusion of the sound coming from given direction. 
