@@ -30,6 +30,9 @@ Speaker positions are provided in normalized coordinates from -1 to +1 with a ce
 
 We can provide you with spatial audio realtime engine. The system expects OSC messages with virtual audio sources positions and it will calculate needed volumes for all speakers to create an illusion of the sound coming from given direction. 
 
+## Dimensions
+6.998 * 18 meters
+
 ## Templates
 WIP
 
