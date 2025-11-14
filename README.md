@@ -19,7 +19,7 @@ We provide Spout to NDI proxy to send the Spout texture to Media server.
 ### Pre-render video
 
 #### Capture NDI / Spout stream
-You can use free [OBS software](https://obsproject.com/) along with [NDI plugin for OBS](https://github.com/DistroAV/DistroAV/releases) to record NDI streams. Better yet, OBS also supports the direct Spout capture.
+You can use free [OBS software](https://obsproject.com/) along with [NDI plugin for OBS](https://github.com/DistroAV/DistroAV/releases) to record NDI streams. Better yet, OBS also supports the direct Spout capture. Unfortunetly, you might be limited by avaliable max resolution inside OBS based on current diplay setting and GPU.
 
 You can also download [NDI Tools](https://ndi.video/tools/). NDI Tools should already include the [NewTek SHQ7 codec]([https://pixera.one/en/](https://www.vizrt.com/support/product-updates/codecs-utilities/newtek-codec-for-windows/)). Output NDI stream from your application, use NDI Tools Studio Monitor to save the stream to disk (it will save it in .mov SHQ7 codec).
 
