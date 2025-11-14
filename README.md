@@ -25,6 +25,8 @@ Output NDI stream from your application, use NDI Tools Studio Monitor to save th
 
 HAP codec can be included in ffmpeg build or using 3rd party paid plugins such as AfterCodecs for Adobe After Effects. See more [here](https://hap.video/using-hap.html).
 
+On Windows you can check if your current ffmpeg build support HAP codec with  `ffmpeg -encoders | findstr /i hap`. Or on Linux / MacOS you can check with `ffmpeg -encoders | grep hap`.
+
 ## Audio
 We have 12.4 2D speaker layout but we are effectively using 12.1 (all 4 subwoofers are fed from single audio source). 
 Speaker positions are provided in normalized coordinates from -1 to +1 with a centroid at (0,0). 
