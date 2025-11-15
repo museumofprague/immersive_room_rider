@@ -8,7 +8,8 @@ color[] colors = new color[3];
 void setup() {
 
   size(1280, 720, P2D);
-
+  surface.setLocation(10, 10);
+  pixelDensity(1);
   // Create graphics objects for the senders
   canvas = new PGraphics[3];
   canvas[0] = createGraphics(9974, 1929, P3D);
@@ -42,6 +43,6 @@ void draw() {
     canvas[i].box(150);
     canvas[i].endDraw();
     senders[i].sendTexture(canvas[i]);
-    image(canvas[i], 640 * (i % 2), 360 * (i / 2),640,360);
+    image(canvas[i], 640 * (i % 2), 360 * (i / 2), 640, 360);
   }
 }
