@@ -1,6 +1,8 @@
 # Imerssive room Museum of Prague
 We are providing technical details for audio visual content for the immersive room at Museum of Prague main building at Florenc, Prague, Czech Republic. 
 
+## Photo
+Convert to equirectangular format first, then you can convert to cubemap [online](https://jaxry.github.io/panorama-to-cubemap/). [Source code](https://github.com/jaxry/panorama-to-cubemap). 
 ## Video
 We are using [Pixera media server](https://pixera.one/en/) for projector blending and synchronization. No need to create videomapping, just pass your clean video to Pixera server.
 
