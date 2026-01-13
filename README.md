@@ -34,6 +34,9 @@ You can use free [OBS software](https://obsproject.com/) along with [NDI plugin 
 * Another option is to use [LightJams Spout recorder](https://www.lightjams.com/spout-recorder.html) for capturing Spout stream. 
 * One more worth looking into is open source [SpoutRecorder](https://github.com/leadedge/SpoutRecorder/). 
 
+#### Preffered video CODEC
+The best quality is achieved using NotchLC codec. The second, slightly worse option is HAP. If you can render to NotchLC. Info about HAP is below. 
+
 #### Convert Video to HAP codec
 
 ##### Ffmpeg
