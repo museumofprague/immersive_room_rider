@@ -9,10 +9,10 @@ We are using [Pixera media server](https://pixera.one/en/) for projector blendin
 * one wall: 9974x1929px
 * floor: 6830 x 2160px
 * 10bit 4:2:2 YcBcR
-* video codec HAP / NochLC
-* accepts NDI streams
+* video codec (HAP) / NotchLC (preffered)
+* accepts NDI streams if you need real-time video
 
-Output three NDI streams from your app - one for each wall, one for floor. We can also mirror the content to other walls / floor (for example you can output just single stream for walls and one for floor if you don't mind same video on both walls). 
+Output three NDI streams from your app - one for each wall, one for floor or you can send one large video that we can split between the walls and floor. We can also mirror the content to other walls / floor (for example you can output just single stream for walls and one for floor if you don't mind same video on both walls). 
 
 In case you can't output NDI, you can use Spout:
 * https://spout.zeal.co/
@@ -56,12 +56,16 @@ We can provide you with spatial audio realtime engine. The system expects OSC me
 ## Dimensions
 6.998 * 18 meters
 
+## Interactivity
+* READY We have about 50 ipads 11 tablets at our disposal for interactive input from users (surveys, drawing, games). We can run websocket and https server at the control PC that can be reached from iPads using local WiFi. This way we can have multiplayer, real-time input and show output on large scale video projection. 
+* IN PROGRESS We are also currently working on implementing Lidar sensors that will track the users movement in the immersive room (2D, feet positions).
+* IN PROGRESS We are working on implementing realtime spatial audio engine.  
+
 ## Templates
 WIP
 
 * Touchdesigner
 * Processing
-
 
 #### Notes
 * [Java Wrapper for NDI](https://github.com/WalkerKnapp/devolay)
