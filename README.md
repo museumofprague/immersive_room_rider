@@ -1,6 +1,22 @@
 # Imerssive room Museum of Prague
 We are providing technical details for audio visual content for the immersive room at Museum of Prague main building at Florenc, Prague, Czech Republic. 
 
+<table>
+  <tr>
+    <td>
+      <img src="./assets/space_empty.png" width="100%" />
+    </td>
+    <td rowspan="2">
+      <img src="./assets/space_videomapping_2.png" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./assets/space_videomapping_1.jpg" width="100%" />
+    </td>
+  </tr>
+</table>
+
 ## Photo
 Convert to equirectangular format first, then you can convert to cubemap [online](https://jaxry.github.io/panorama-to-cubemap/). [Source code](https://github.com/jaxry/panorama-to-cubemap). 
 ## Video
