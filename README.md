@@ -82,8 +82,8 @@ We can provide you with spatial audio realtime engine. The system expects OSC me
 We have 4 2D 360 lidars [PicoScan150](https://www.sick.com/se/en/catalog/products/lidar-and-radar-sensors/lidar-sensors/picoscan100/pics150-01000-core-2-6-io/p/p682000?tab=detail) from Sick installed in the room. We are using [Pharus](https://ars.electronica.art/futurelab/en/pharus/) tracking system from Ars Electronica center. 
 
 Lidar IP addresses (for maintanance only - do not interface directly!): 
-* 192.168.0.67
-* 192.168.0.66
+* 192.168.0.67 - right back (closest to Langweil model of Prague room)
+* 192.168.0.66 - right front
 * 192.168.0.65 - left wall back
 * 192.168.0.64 - left wall front (closest to the entrance from foyer)
   * port 7503
