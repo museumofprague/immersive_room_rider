@@ -1,0 +1,30 @@
+Room dimensions [m]:
+Length: 21.842
+Width: 5.938
+
+Fix 1
+X 8m
+Y 2m
+
+Fix 2
+X 11m
+Y 4.5m
+
+Fix 3
+X 14m
+Y 1.5m
+
+Lidar left front .64 (closest to entrance from foyer)
+4.288 x
+5.938 y
+
+Lidar left back .65
+14.150 x
+
+Lidar right front .66
+5.117 x
+0 y
+
+Lidar right back .67 (closest to langweil model)
+16.119 x
+0 y
