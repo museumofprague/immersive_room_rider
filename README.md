@@ -77,6 +77,24 @@ We can provide you with spatial audio realtime engine. The system expects OSC me
 * IN PROGRESS We are also currently working on implementing Lidar sensors that will track the users movement in the immersive room (2D, feet positions).
 * IN PROGRESS We are working on implementing realtime spatial audio engine.  
 
+
+## Lidar - Pharos system
+We have 4 2D 360 lidars [PicoScan150](https://www.sick.com/se/en/catalog/products/lidar-and-radar-sensors/lidar-sensors/picoscan100/pics150-01000-core-2-6-io/p/p682000?tab=detail) from Sick installed in the room. We are using [Pharus](https://ars.electronica.art/futurelab/en/pharus/) tracking system from Ars Electronica center. 
+
+Lidar IP addresses (for maintanance only - do not interface directly!): 
+* 192.168.0.67
+* 192.168.0.66
+* 192.168.0.65 - left wall back
+* 192.168.0.64 - left wall front (closest to the entrance from foyer)
+  * port 7503
+  * 255.255.255
+  * adressing mode: static
+
+picoScan 150 Specs:
+* 25m range
+* 276 Degree Angle
+* 1 Degree Res
+
 ## Templates
 WIP
 
