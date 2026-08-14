@@ -51,7 +51,7 @@ You can use free [OBS software](https://obsproject.com/) along with [NDI plugin 
 * One more worth looking into is open source [SpoutRecorder](https://github.com/leadedge/SpoutRecorder/). 
 
 #### Preffered video CODEC
-The best quality is achieved using NotchLC codec. The second, slightly worse option is HAP. If you can render to NotchLC. Info about HAP is below. 
+The best quality is achieved using NotchLC codec. The second, slightly worse option is HAP. If you can render to NotchLC. Info about HAP is below. Pixera server that is installed on the main server PC have built-in capability to [encode to NotchLC](https://help.pixera.one/pixera-251/notch-lc-encoding), NotchLC also provides [plugins](https://www.notch.one/downloads) for Adobe Premiere / After effects / Encoder that can be used. 
 
 #### Convert Video to HAP codec
 
