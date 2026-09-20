@@ -3,7 +3,7 @@
 
 import TUIO.*;
 
-final int TUIO_PORT = 2112;
+final int TUIO_PORT = 3333;
 TuioProcessing tuioClient;
 
 void setupTuio() {
