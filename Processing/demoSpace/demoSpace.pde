@@ -9,6 +9,10 @@ import TUIO.*;
 // The longest side of the texture is capped at MAX_SIDE px. Pixera maps each region
 // to its physical surface later; here we only bake one texture and draw white borders.
 
+//in Pixera server set 3 surfaces as left wall: y offset 2520
+//right wall - fx flip horizontal + vertical, y offset 2520
+//floor - keep as is, set live source to Spout
+
 final int MAX_SIDE = 4096;
 
 // source content sizes in projector pixels (width x height)
