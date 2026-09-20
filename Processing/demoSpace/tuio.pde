@@ -46,10 +46,15 @@ void drawTuio(PGraphics g) {
       g.strokeWeight(3);
     }
   }
+  // blobs: rotated ellipse sized by width/height
+  for (TuioBlob tblb : tuioClient.getTuioBlobList()) {
+    g.pushMatrix();
+    g.translate(tblb.getX() * g.width, tblb.getY() * g.height);
+    g.rotate(tblb.getAngle());
+    g.ellipse(0, 0, tblb.getWidth() * g.width, tblb.getHeight() * g.height);
+    g.popMatrix();
+  }
 }
-
-// ---------------------------------------------------------------
-// TUIO callbacks (invoked by TuioProcessing via reflection)
 
 void addTuioObject(TuioObject tobj) {
   println("add obj " + tobj.getSymbolID() + " " + tobj.getX() + " " + tobj.getY());
@@ -69,6 +74,16 @@ void updateTuioCursor(TuioCursor tcur) { }
 
 void removeTuioCursor(TuioCursor tcur) {
   println("del cur " + tcur.getCursorID());
+}
+
+void addTuioBlob(TuioBlob tblb) {
+  println("add blob " + tblb.getBlobID() + " (" + tblb.getX() + ", " + tblb.getY() + ")");
+}
+
+void updateTuioBlob(TuioBlob tblb) { }
+
+void removeTuioBlob(TuioBlob tblb) {
+  println("del blob " + tblb.getBlobID());
 }
 
 void refresh(TuioTime bundleTime) { redraw(); }

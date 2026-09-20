@@ -32,7 +32,8 @@ final String[] REGION_NAME = { "left_wall", "floor", "right_wall" };
 int[] regX, regY, regW, regH;
 color[] regColor = { color(200, 40, 40), color(40, 180, 60), color(40, 80, 220) };
 
-PGraphics canvas;
+PGraphics canvas2D;  // P2D shared space
+PGraphics canvas3D;  // P3D offscreen for 3D content
 Spout sender;
 
 String OS; // "windows", "macos", "linux"
@@ -47,11 +48,13 @@ void setup() {
   println("OS: " + OS);
 
   surface.setLocation(10, 10);
-  pixelDensity(1);
 
   computeLayout();
 
-  canvas = createGraphics(textureWidth, textureHeight, P2D);
+  // shared 2D canvas (P2D): regions, 2D content, borders, TUIO, Spout source
+  canvas2D = createGraphics(textureWidth, textureHeight, P2D);
+  // 3D content buffer (P3D): rendered separately, composited into canvas via image()
+  canvas3D = createGraphics(textureWidth, textureHeight, P3D);
 
   if (OS.equals("windows")) {
     sender = new Spout(this);
@@ -95,49 +98,82 @@ void computeLayout() {
 }
 
 void draw() {
-  canvas.beginDraw();
-  canvas.background(0);
-  canvas.noStroke();
+  float t = millis() * 0.001;
 
+  // ================================================================
+  // 3D DEMO: render the rotating box in its own P3D buffer, isolated
+  // on a transparent background. Keeping it in a separate buffer means
+  // the 2D region fills (drawn in P2D) can never depth-clip / occlude
+  // the box corners. We composite it onto the shared canvas with image().
+  // ================================================================
+  canvas3D.beginDraw();
+  canvas3D.clear();                 // transparent, no background fill
+  canvas3D.lights();
+  canvas3D.noStroke();
+  // explicit frustum: default far plane is too tight for this buffer size
+  float fov = PI / 3.0;
+  float eyeZ = (textureHeight / 2.0) / tan(fov / 2.0);
+  canvas3D.camera(textureWidth / 2.0, textureHeight / 2.0, eyeZ,
+                textureWidth / 2.0, textureHeight / 2.0, 0, 0, 1, 0);
+  canvas3D.perspective(fov, textureWidth / (float) textureHeight, 1, eyeZ * 4);
+  float boxS = textureHeight * 0.15;
+  canvas3D.pushMatrix();
+  canvas3D.translate((0.5 + 0.42 * sin(t * 0.31)) * textureWidth,
+                   (0.5 + 0.42 * sin(t * 0.17)) * textureHeight);
+  canvas3D.rotateX(t * 0.7);
+  canvas3D.rotateY(t * 0.9);
+  canvas3D.fill(255);
+  canvas3D.box(boxS);
+  canvas3D.popMatrix();
+  canvas3D.endDraw();
+
+  // ================================================================
+  // SHARED 2D CANVAS (P2D): the merged wall/floor/wall space.
+  // Everything here is flat 2D and shares one continuous surface, so
+  // content flows across region borders without a size jump.
+  // ================================================================
+  canvas2D.beginDraw();
+  canvas2D.background(0);
+  canvas2D.noStroke();
+
+  // per-region background color: shows wall / floor / wall boundaries
   for (int i = 0; i < PROJ_PX.length; i++) {
-    canvas.pushMatrix();
-    canvas.translate(regX[i], regY[i]);
-
-    // region background
-    canvas.fill(regColor[i]);
-    canvas.rect(0, 0, regW[i], regH[i]);
-
-    // demo content: rotating box, sized to fit inside the region
-    canvas.lights();
-    canvas.pushMatrix();
-    canvas.translate(regW[i] / 2.0, regH[i] / 2.0);
-    canvas.rotateX(frameCount * 0.01);
-    canvas.rotateY(frameCount * 0.01);
-    canvas.fill(255);
-    canvas.box(min(regW[i], regH[i]) * 0.4);
-    canvas.popMatrix();
-
-    canvas.popMatrix();
+    canvas2D.fill(regColor[i]);
+    canvas2D.rect(regX[i], regY[i], regW[i], regH[i]);
   }
+
+  // 2D DEMO: a circle moving across all three regions. Like the box, its
+  // position is in shared texture space, so it visibly crosses the borders.
+  canvas2D.noFill();
+  canvas2D.stroke(255, 220);
+  canvas2D.strokeWeight(textureHeight * 0.01);
+  float circR = textureHeight * 0.08;
+  float cx = (0.5 + 0.40 * sin(t * 0.23 + 2.0)) * textureWidth;
+  float cy = (0.5 + 0.40 * sin(t * 0.13 + 1.0)) * textureHeight;
+  canvas2D.ellipse(cx, cy, circR * 2, circR * 2);
+  canvas2D.noStroke();
+
+  // composite the 3D box on top of the 2D content
+  canvas2D.image(canvas3D, 0, 0);
 
   // white borders on region boundaries (drawn last, on top)
-  canvas.noFill();
-  canvas.stroke(255);
-  canvas.strokeWeight(2);
+  canvas2D.noFill();
+  canvas2D.stroke(255);
+  canvas2D.strokeWeight(2);
   for (int i = 0; i < PROJ_PX.length; i++) {
-    canvas.rect(regX[i], regY[i], regW[i], regH[i]);
+    canvas2D.rect(regX[i], regY[i], regW[i], regH[i]);
   }
-  canvas.noStroke();
+  canvas2D.noStroke();
 
-  drawTuio(canvas);
+  drawTuio(canvas2D);
 
-  canvas.endDraw();
+  canvas2D.endDraw();
 
   if (OS.equals("windows")) {
-    sender.sendTexture(canvas);
+    sender.sendTexture(canvas2D);
   }
 
   // scaled preview in the window
   background(30);
-  image(canvas, 0, 0, width, height);
+  image(canvas2D, 0, 0, width, height);
 }
