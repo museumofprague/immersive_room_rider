@@ -1,0 +1,18 @@
+<config>
+  <observationspace id="1" type="0" left="0" right="21.842" upper="5.938" lower="0"/>
+  <mappingspace left="0" right="21.842" upper="5.938" lower="0"/>
+  <tuiosender on="0" ip="127.0.0.1" port="3333" transmitechoes="1"/>
+  <oscsender on="1" ip="127.0.0.1" port="7000" transmitechoes="0"/>
+  <tracklink on="1" ip="127.0.0.1" port="44345" multicast="1"/>
+  <frontline on="0" ip="127.0.0.1" port="44350" columns="256"/>
+  <scanner id="1" spaceid="1" type="5" ip="192.168.0.64" port="2112" x="4.288" y="5.938" angle="0.25" flipped="1"/>
+  <scanner id="2" spaceid="1" type="5" ip="192.168.0.65" port="2112" x="14.15" y="5.938" angle="0.25" flipped="1"/>
+  <scanner id="3" spaceid="1" type="5" ip="192.168.0.66" port="2112" x="5.117" y="0" angle="-0.75" flipped="1"/>
+  <scanner id="4" spaceid="1" type="5" ip="192.168.0.67" port="2112" x="16.119" y="0" angle="-0.75" flipped="1"/>
+  <tracker confirmedechoes="1" trackconfidence="5" maxassignmentdistance="0.85" agility="0.05" orithresh="0.25" singleechomode="0" heading="0.2" filtercompensation="0" speedweight="0"/>
+  <echogenerator waitall="0" minObjectWidth="0.05" maxObjectWidth="10" maxCorrelationDistance="0.36" innerObjectDistance="0.1" echoComputationMode="1" sensorTimeoutMillis="5000"/>
+  <app trails="1" scanlines="1" echoes="1" fullscreen="0" width="1280" height="800" fov="0.32"/>
+  <fix x="8" y="2"/>
+  <fix x="11" y="4.5"/>
+  <fix x="14" y="1.5"/>
+</config>
