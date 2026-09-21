@@ -104,7 +104,7 @@ Two example sketches in [`Processing/`](./Processing) demonstrate the full realt
 
 #### Required libraries
 
-Install into your Processing sketchbook (`~/Documents/Processing/libraries/`) — either from the links or from our zipped copies inside [`Processing/libraries/`](./Processing/libraries) (unzip into the `libraries` folder).
+Install into your Processing sketchbook (`~/Documents/Processing/libraries/`) — either from the links or from our zipped copies inside [`Processing/libraries/`](./Processing/libraries) (unzip into the `libraries` folder). Note that Syphon is only used to enable testing on MacOS, it is not used in the immersive room as the server is running windows. 
 
 | Library | Source | Local copy |
 |---|---|---|
