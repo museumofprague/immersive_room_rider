@@ -14,7 +14,7 @@ import spout.*;
 import com.krab.lazy.*;
 import peasy.*;
 import peasy.CameraState;
-import cz.vleischner.ndi.*;
+import p5.ndi.*;
 import java.util.Arrays;
 
 final String SENDER_NAME = "processing_demospace";

@@ -1,7 +1,7 @@
 import spout.*;
 import TUIO.*;
 import codeanticode.syphon.*;
-import cz.vleischner.ndi.*;
+import p5.ndi.*;
 
 // A single merged output texture: left wall / floor / right wall stacked vertically.
 // Regions are sized by PHYSICAL extent, not source pixel count: the floor has fewer
