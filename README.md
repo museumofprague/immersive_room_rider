@@ -95,11 +95,8 @@ picoScan 150 Specs:
 * 276 Degree Angle
 * 1 Degree Res
 
-## Templates
+## Touchdesigner Templates
 WIP
-
-* Touchdesigner
-* Processing
 
 ### Processing template
 
@@ -107,7 +104,7 @@ Two example sketches in [`Processing/`](./Processing) demonstrate the full realt
 
 #### Required libraries
 
-Install into your Processing sketchbook (`~/Documents/Processing/libraries/` on macOS, `Documents\Processing\libraries\` on Windows) — either from the links or from our zipped copies inside [`Processing/libraries/`](./Processing/libraries) (unzip into the `libraries` folder).
+Install into your Processing sketchbook (`~/Documents/Processing/libraries/`) — either from the links or from our zipped copies inside [`Processing/libraries/`](./Processing/libraries) (unzip into the `libraries` folder).
 
 | Library | Source | Local copy |
 |---|---|---|
@@ -135,6 +132,3 @@ Test companion. It simulates the hardware side of the room:
 * acts as a **Pixera-server stand-in**: receives the shared texture (pick `Spout` / `Syphon` or `NDI` in the *Receiver* radio in the GUI) and shows a 3D preview of the room (wall / floor / wall) with the texture mapped per region — orbit with mouse, double-click to reset the view, toggle flat 2D, walker overlay and transport at runtime
 
 Run both sketches on one machine to verify the whole pipeline before deploying to the room PCs.
-
-#### Notes
-* [Java Wrapper for NDI](https://github.com/WalkerKnapp/devolay)
