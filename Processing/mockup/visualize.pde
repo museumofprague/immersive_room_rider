@@ -14,7 +14,7 @@ import spout.*;
 import com.krab.lazy.*;
 import peasy.*;
 import peasy.CameraState;
-import p5.ndi.*;
+import ndi.stream.*;
 import java.util.Arrays;
 
 final String SENDER_NAME = "processing_demospace";
@@ -124,28 +124,28 @@ void receiveTexture() {
 
 // --- NDI ---
 
-NDIP5Receiver ndiReceiver;
-NDIP5VideoFrame ndiFrame;
+NDIReceiver ndiReceiver;
+NDIVideoFrame ndiFrame;
 long ndiLastTry = 0;
 
 void receiveNDI() {
   try {
     if (ndiReceiver == null) {
       // BGRX_BGRA bytes == PImage ARGB ints in little-endian: bulk int copy
-      ndiReceiver = new NDIP5Receiver(NDIP5Receiver.ColorFormat.BGRX_BGRA, 100, false, "mockup");
-      ndiFrame = new NDIP5VideoFrame();
+      ndiReceiver = new NDIReceiver(NDIReceiver.ColorFormat.BGRX_BGRA, 100, false, "mockup");
+      ndiFrame = new NDIVideoFrame();
     }
     if (ndiReceiver.getConnectionCount() < 1 && millis() - ndiLastTry > 2000) {
       ndiLastTry = millis();
-      try (NDIP5Finder finder = new NDIP5Finder()) {
-        NDIP5Source[] srcs = finder.getCurrentSources();
+      try (NDIFinder finder = new NDIFinder()) {
+        NDISource[] srcs = finder.getCurrentSources();
         if (srcs.length == 0) {
           finder.waitForSources(1500);
           srcs = finder.getCurrentSources();
         }
         if (srcs.length > 0) {
-          NDIP5Source pick = srcs[0];
-          for (NDIP5Source s : srcs) {
+          NDISource pick = srcs[0];
+          for (NDISource s : srcs) {
             if (s.getSourceName().contains(SENDER_NAME)) { pick = s; break; }
           }
           ndiReceiver.connect(pick);
@@ -153,8 +153,8 @@ void receiveNDI() {
         }
       }
     }
-    NDIP5FrameType ft = ndiReceiver.receiveCapture(ndiFrame, null, null, 0);
-    if (ft == NDIP5FrameType.VIDEO) {
+    NDIFrameType ft = ndiReceiver.receiveCapture(ndiFrame, null, null, 0);
+    if (ft == NDIFrameType.VIDEO) {
       int w = ndiFrame.getXResolution();
       int h = ndiFrame.getYResolution();
       if (spoutImg == null || spoutImg.width != w || spoutImg.height != h) {

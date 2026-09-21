@@ -1,7 +1,7 @@
 import spout.*;
 import TUIO.*;
 import codeanticode.syphon.*;
-import p5.ndi.*;
+import ndi.stream.*;
 
 // A single merged output texture: left wall / floor / right wall stacked vertically.
 // Regions are sized by PHYSICAL extent, not source pixel count: the floor has fewer
@@ -52,8 +52,8 @@ final String SENDER_NAME = "processing_demospace";
 
 // texture sharing transport: GPU (Spout/Syphon) or NDI, toggled with 'n'
 boolean useNDI = false;
-NDIP5Sender ndiSender;
-NDIP5VideoFrame ndiFrame;
+NDISender ndiSender;
+NDIVideoFrame ndiFrame;
 // double buffer: one is in flight with the async sender while the other is filled
 java.nio.ByteBuffer[] ndiData = new java.nio.ByteBuffer[2];
 java.nio.IntBuffer[] ndiDataInts = new java.nio.IntBuffer[2];
@@ -156,10 +156,10 @@ void publishTexture() {
 // NDI is created lazily on first use so the source only appears when wanted
 void initNDISender() {
   try {
-    ndiSender = new NDIP5Sender(SENDER_NAME);
-    ndiFrame = new NDIP5VideoFrame();
+    ndiSender = new NDISender(SENDER_NAME);
+    ndiFrame = new NDIVideoFrame();
     ndiFrame.setResolution(textureWidth, textureHeight);
-    ndiFrame.setFourCCType(NDIP5FrameFourCCType.BGRA);
+    ndiFrame.setFourCCType(NDIFrameFourCCType.BGRA);
     ndiFrame.setFrameRate(30, 1);
     ndiFrame.setLineStride(textureWidth * 4);
     for (int i = 0; i < 2; i++) {
