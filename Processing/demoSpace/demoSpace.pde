@@ -88,6 +88,7 @@ void setup() {
   }
 
   setupTuio();
+  setupOSC();
 }
 
 // one shared physical scale for every region -> continuous surface, correct aspect

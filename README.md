@@ -112,8 +112,11 @@ Install into your Processing sketchbook (`~/Documents/Processing/libraries/`) �
 | NDI | [NDI for Processing (NDI_p5)](https://github.com/trackme518/NDI_processing) | — |
 | Spout | [SpoutProcessing](https://github.com/leadedge/SpoutProcessing) | [spout.zip](./Processing/libraries/spout.zip) |
 | TUIO | [TUIO11_Processing](https://github.com/mkalten/TUIO11_Processing) | [TUIO.zip](./Processing/libraries/TUIO.zip) |
+| LazyGui | [krab-lab/LazyGui](https://github.com/krab-lab/LazyGui) | [LazyGui.zip](./Processing/libraries/LazyGui.zip) |
+| oscP5 | [sojamo/oscP5](https://github.com/sojamo/oscP5) — [original site](https://www.sojamo.com/oscP5/) | [oscP5.zip](./Processing/libraries/oscP5.zip) |
+| PeasyCam | [processing/peasycam](https://github.com/processing/peasycam) | [peasycam.zip](./Processing/libraries/peasycam.zip) |
 
-The sketches also use **LazyGui** and **PeasyCam** (install via Processing's "Add Library" manager). NDI additionally requires the [NDI Runtime](https://ndi.video/download-the-ndi-runtime/) installed on the machine.
+NDI additionally requires the [NDI Runtime](https://ndi.video/download-the-ndi-runtime/) installed on the machine.
 
 #### demoSpace — content sender
 
