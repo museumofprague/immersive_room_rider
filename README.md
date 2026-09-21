@@ -101,5 +101,40 @@ WIP
 * Touchdesigner
 * Processing
 
+### Processing template
+
+Two example sketches in [`Processing/`](./Processing) demonstrate the full realtime pipeline (texture sharing + lidar tracking) without any room hardware.
+
+#### Required libraries
+
+Install into your Processing sketchbook (`~/Documents/Processing/libraries/` on macOS, `Documents\Processing\libraries\` on Windows) — either from the links or from our zipped copies inside [`Processing/libraries/`](./Processing/libraries) (unzip into the `libraries` folder).
+
+| Library | Source | Local copy |
+|---|---|---|
+| Syphon | [our fork](https://github.com/trackme518/Java/tree/universal-binary-support) (adds macOS Apple Silicon / universal binary support) — [original](https://github.com/Syphon/Processing) | [Syphon.zip](./Processing/libraries/Syphon.zip) |
+| NDI | [NDI for Processing (NDI_p5)](https://github.com/trackme518/NDI_processing) | — |
+| Spout | [SpoutProcessing](https://github.com/leadedge/SpoutProcessing) | [spout.zip](./Processing/libraries/spout.zip) |
+| TUIO | [TUIO11_Processing](https://github.com/mkalten/TUIO11_Processing) | [TUIO.zip](./Processing/libraries/TUIO.zip) |
+
+The sketches also use **LazyGui** and **PeasyCam** (install via Processing's "Add Library" manager). NDI additionally requires the [NDI Runtime](https://ndi.video/download-the-ndi-runtime/) installed on the machine.
+
+#### demoSpace — content sender
+
+Reference sender sketch. It composes a single merged texture (4096x2880: left wall / floor / right wall stacked vertically, regions sized by physical extent so surfaces form one continuous canvas — see region constants at the top of `demoSpace.pde`) and shares it via:
+
+* GPU texture sharing (default): **Spout** on Windows, **Syphon** on macOS — zero-copy, fastest
+* **NDI** — press `n` to toggle (hint shown top-left, fps top-right); works across the network, costs CPU
+
+It also receives TUIO/OSC cursor messages on port 3333 and draws them into the texture, so it is directly viewable on the Pixera server (which accepts NDI / Spout) or on the room surfaces.
+
+#### mockup — lidar & Pixera simulation
+
+Test companion. It simulates the hardware side of the room:
+
+* acts as a **lidar / Pharus tracker stand-in**: generates people walking through the room (or drag your own cursor) and broadcasts them as TUIO/OSC on UDP 3333, exactly like the real tracking output
+* acts as a **Pixera-server stand-in**: receives the shared texture (pick `Spout` / `Syphon` or `NDI` in the *Receiver* radio in the GUI) and shows a 3D preview of the room (wall / floor / wall) with the texture mapped per region — orbit with mouse, double-click to reset the view, toggle flat 2D, walker overlay and transport at runtime
+
+Run both sketches on one machine to verify the whole pipeline before deploying to the room PCs.
+
 #### Notes
 * [Java Wrapper for NDI](https://github.com/WalkerKnapp/devolay)

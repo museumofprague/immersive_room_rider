@@ -1,4 +1,4 @@
-// mockupTuio: TUIO 1.1 server simulation for the tracked room.
+// mockup: TUIO 1.1 server simulation for the tracked room.
 //
 // Sends /tuio/2Dcur cursor frames (TUIO 1.0 addressing) over UDP/OSC, mimicking the Pharus tracker:
 // people enter through doors, wander the space, and leave. Coordinates are
@@ -13,6 +13,7 @@
 
 import com.illposed.osc.*;
 import java.net.InetAddress;
+import codeanticode.syphon.*;
 
 // --- tracking space (pharus/config.xml, meters) ---
 final float SPACE_W = 21.842;
@@ -41,8 +42,28 @@ ArrayList<Walker> walkers = new ArrayList<Walker>();
 int nextWalkerId = 0;
 float nextSpawnAt = 0;
 
+// rolling TUIO event log, shown in the LazyGui "TUIO logs" panel
+ArrayList<String> tuioLogs = new ArrayList<String>();
+final int TUIO_LOG_MAX = 5;
+
+void tuioLog(String s) {
+  tuioLogs.add(0, nf(hour(), 2) + ":" + nf(minute(), 2) + ":" + nf(second(), 2) + "  " + s);
+  while (tuioLogs.size() > TUIO_LOG_MAX) tuioLogs.remove(tuioLogs.size() - 1);
+}
+
+void settings() {
+  size(1280, 720, P3D); // P3D for PeasyCam 3D room view (see visualize tab)
+}
+
+String OS; // "windows", "macos", "linux"
+
 void setup() {
-  size(1200, 327); // 1:100 scale of the space, y flipped for screen
+  String osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("win")) OS = "windows";
+  else if (osName.contains("mac")) OS = "macos";
+  else OS = "linux";
+  println("OS: " + OS);
+
   frameRate(30);
   try {
     tuioSender = new OSCPortOut(InetAddress.getByName(TUIO_DEST_IP), TUIO_PORT);
@@ -50,14 +71,17 @@ void setup() {
     println("TUIO sender init failed: " + e);
     exit();
   }
-  println("mockupTuio -> " + TUIO_DEST_IP + ":" + TUIO_PORT + " (" + TUIO_ADDR + ")");
+  tuioLog("sender -> " + TUIO_DEST_IP + ":" + TUIO_PORT + " " + TUIO_ADDR);
+  setupViz();
 }
 
 void draw() {
   float dt = 1.0 / frameRate;
 
-  // spawn people periodically, max 4 at a time
-  if (millis() > nextSpawnAt && walkers.size() < 4) {
+  readGui();
+
+  // spawn people periodically, max 4 at a time (simulated-walker mode only)
+  if (!modeMouse && millis() > nextSpawnAt && walkers.size() < 4) {
     spawnWalker();
     nextSpawnAt = millis() + random(1500, 4000);
   }
@@ -68,12 +92,12 @@ void draw() {
     w.update(dt);
     if (w.done) {
       walkers.remove(i);
-      println("leave id " + w.id);
+      tuioLog("leave id " + w.id);
     }
   }
 
   sendTuioFrame();
-  drawTopView();
+  drawViz();
 }
 
 void spawnWalker() {
@@ -85,7 +109,7 @@ void spawnWalker() {
   PVector mid = new PVector(random(2, SPACE_W - 2), random(1, SPACE_H - 1));
   Walker w = new Walker(nextWalkerId++, start, mid, outDoor);
   walkers.add(w);
-  println("enter id " + w.id + " at (" + start.x + ", " + start.y + ")");
+  tuioLog("enter id " + w.id + " at (" + nf(start.x, 2, 2) + ", " + nf(start.y, 2, 2) + ")");
 }
 
 // --- TUIO 1.1 messages ---
@@ -133,6 +157,7 @@ class Walker {
   float phase;
   PVector mid, exitDoor;
   boolean reachedMid;
+  boolean frozen;      // mouse-driven walker: position set externally
   boolean done;
 
   Walker(int id, PVector start, PVector mid, PVector exitDoor) {
@@ -146,6 +171,7 @@ class Walker {
   }
 
   void update(float dt) {
+    if (frozen) return;  // position/velocity driven externally (mouse mode)
     // one-way path: entry -> mid (latched once reached) -> exit door
     if (!reachedMid && dist(x, y, mid.x, mid.y) < 0.5) reachedMid = true;
     PVector target = reachedMid ? exitDoor : mid;
@@ -171,37 +197,4 @@ class Walker {
   // velocities in the same normalized units (y axis is flipped by the mapping)
   float nvx() { return vx / SPACE_W; }
   float nvy() { return -vy / SPACE_H * (FLOOR_TUIO_Y1 - FLOOR_TUIO_Y0); }
-}
-
-// --- top view debug ---
-
-void drawTopView() {
-  background(20);
-  pushMatrix();
-  scale((float) width / SPACE_W);
-
-  noFill();
-  stroke(90);
-  strokeWeight(0.05f);
-  rect(0, 0, SPACE_W, SPACE_H);
-
-  // doors (y flipped for screen coords, same as walkers)
-  stroke(120, 120, 0);
-  strokeWeight(0.15f);
-  float dl = SPACE_H - DOOR_LEFT.y;
-  float dr = SPACE_H - DOOR_RIGHT.y;
-  line(DOOR_LEFT.x, dl - 0.6f, DOOR_LEFT.x, dl + 0.6f);
-  line(DOOR_RIGHT.x - 0.6f, dr, DOOR_RIGHT.x + 0.6f, dr);
-
-  // people
-  noStroke();
-  for (Walker w : walkers) {
-    fill(255);
-    circle(w.x, SPACE_H - w.y, 0.7f); // flip y for screen coords
-  }
-  popMatrix();
-
-  fill(200);
-  textSize(12);
-  text("walkers: " + walkers.size() + "   frame: " + frameId, 8, height - 8);
 }

@@ -15,7 +15,7 @@ void setupTuio() {
 void drawTuio(PGraphics g) {
   if (tuioClient == null) return;
 
-  g.noLights();
+  //g.noLights();
   g.strokeWeight(3);
 
   // objects: rotated square at normalized position
