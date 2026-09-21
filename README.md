@@ -108,7 +108,7 @@ Install into your Processing sketchbook (`~/Documents/Processing/libraries/`) �
 
 | Library | Source | Local copy |
 |---|---|---|
-| Syphon | [our fork](https://github.com/trackme518/Java/tree/universal-binary-support) (adds macOS Apple Silicon / universal binary support) — [original](https://github.com/Syphon/Processing) | [Syphon.zip](./Processing/libraries/Syphon.zip) |
+| Syphon | [my fork](https://github.com/trackme518/Java/tree/universal-binary-support) (adds macOS Apple Silicon / universal binary support) — [original](https://github.com/Syphon/Processing) | [Syphon.zip](./Processing/libraries/Syphon.zip) |
 | NDI | [NDI for Processing (NDI_p5)](https://github.com/trackme518/NDI_processing) | — |
 | Spout | [SpoutProcessing](https://github.com/leadedge/SpoutProcessing) | [spout.zip](./Processing/libraries/spout.zip) |
 | TUIO | [TUIO11_Processing](https://github.com/mkalten/TUIO11_Processing) | [TUIO.zip](./Processing/libraries/TUIO.zip) |
@@ -116,7 +116,7 @@ Install into your Processing sketchbook (`~/Documents/Processing/libraries/`) �
 | oscP5 | [sojamo/oscP5](https://github.com/sojamo/oscP5) — [original site](https://www.sojamo.com/oscP5/) | [oscP5.zip](./Processing/libraries/oscP5.zip) |
 | PeasyCam | [processing/peasycam](https://github.com/processing/peasycam) | [peasycam.zip](./Processing/libraries/peasycam.zip) |
 
-NDI additionally requires the [NDI Runtime](https://ndi.video/download-the-ndi-runtime/) installed on the machine.
+NDI might requires the [NDI Runtime](https://ndi.video/download-the-ndi-runtime/) installed on the machine (to be tested). Alternatively you can use [Spout to NDI](./SPOUT/SPOUTtoNDI_v2027) app (which may run faster - to be tested). 
 
 #### demoSpace — content sender
 
