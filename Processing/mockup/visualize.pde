@@ -91,8 +91,8 @@ void setupSyphonReceiver() {
     syphonGetImage = c.getMethod("getImage", PImage.class);
     syphonActiveM = c.getMethod("active");
     syphonNewFrameM = c.getMethod("newFrame");
-    Object[] servers = (Object[]) c.getMethod("listServers").invoke(null);
-    if (servers.length == 0) println("Syphon: no servers registered yet, retrying");
+    // NB: no listServers() here - it sleeps up to 500ms on the main thread;
+    // discovery happens via the client re-created in the receiveNative retry
   } catch (Throwable e) {
     Throwable c = e.getCause() != null ? e.getCause() : e;
     c.printStackTrace();
@@ -160,11 +160,8 @@ void receiveNDI() {
       if (spoutImg == null || spoutImg.width != w || spoutImg.height != h) {
         spoutImg = createImage(w, h, ARGB);
       }
-      java.nio.ByteBuffer data = ndiFrame.getData();
-      data.order(java.nio.ByteOrder.LITTLE_ENDIAN);
-      data.rewind();
-      spoutImg.loadPixels();
-      data.asIntBuffer().get(spoutImg.pixels);
+      // BGRA bytes in little-endian == PImage ARGB ints: one bulk copy, no per-pixel work
+      NDIUtilities.copyBufferToPixels(ndiFrame.getData(), spoutImg.pixels);
       spoutImg.updatePixels();
     }
   } catch (Exception e) {

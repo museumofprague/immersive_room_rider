@@ -54,9 +54,11 @@ final String SENDER_NAME = "processing_demospace";
 boolean useNDI = false;
 NDISender ndiSender;
 NDIVideoFrame ndiFrame;
-// double buffer: one is in flight with the async sender while the other is filled
-java.nio.ByteBuffer[] ndiData = new java.nio.ByteBuffer[2];
-java.nio.IntBuffer[] ndiDataInts = new java.nio.IntBuffer[2];
+// rotating buffers: the async sender may still own the last submitted frames,
+// so keep more in flight than one to never overwrite a buffer NDI is reading
+final int NDI_BUFFERS = 3;
+java.nio.ByteBuffer[] ndiData = new java.nio.ByteBuffer[NDI_BUFFERS];
+java.nio.IntBuffer[] ndiDataInts = new java.nio.IntBuffer[NDI_BUFFERS];
 int ndiBufferIndex = 0;
 int fpsFrames = 0;
 long fpsLastMillis = 0;
@@ -160,9 +162,11 @@ void initNDISender() {
     ndiFrame = new NDIVideoFrame();
     ndiFrame.setResolution(textureWidth, textureHeight);
     ndiFrame.setFourCCType(NDIFrameFourCCType.BGRA);
-    ndiFrame.setFrameRate(30, 1);
+    // declare the rate the sketch actually submits at; a wrong (lower) value makes
+    // the receiver pace/clock frames against a fake timeline
+    ndiFrame.setFrameRate(Math.max(1, Math.round(frameRate)), 1);
     ndiFrame.setLineStride(textureWidth * 4);
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < NDI_BUFFERS; i++) {
       ndiData[i] = java.nio.ByteBuffer.allocateDirect(textureWidth * textureHeight * 4)
                  .order(java.nio.ByteOrder.LITTLE_ENDIAN);
       ndiDataInts[i] = ndiData[i].asIntBuffer();
@@ -175,12 +179,12 @@ void initNDISender() {
 }
 
 // PImage pixels are 0xAARRGGBB ints = BGRA bytes little-endian: direct copy.
-// Async submit returns immediately; alternate buffers so the in-flight one
-// is never overwritten while NDI still owns it.
+// Async submit returns immediately; rotate through NDI_BUFFERS so a buffer is
+// only refilled after the async sender is done with it.
 void publishNDI() {
   if (ndiSender == null) return;
   canvas2D.loadPixels();
-  ndiBufferIndex ^= 1;
+  ndiBufferIndex = (ndiBufferIndex + 1) % NDI_BUFFERS;
   ndiDataInts[ndiBufferIndex].position(0);
   ndiDataInts[ndiBufferIndex].put(canvas2D.pixels);
   ndiFrame.setData(ndiData[ndiBufferIndex]);

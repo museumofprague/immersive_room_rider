@@ -24,6 +24,11 @@ final String TUIO_DEST_IP = "127.0.0.1";
 final int TUIO_PORT = 3333;
 final String TUIO_ADDR = "/tuio/2Dcur"; // TUIO 1.0 addr: installed lib has no 2cl handler
 
+// TUIO frames are throttled to ~30 Hz like the real Pharus tracker,
+// independent of the sketch's (viewport) frame rate
+final float TUIO_SEND_INTERVAL = 1000.0 / 30.0;
+long nextTuioSendAt = 0;
+
 // People walk on the floor, which in demoSpace's merged texture occupies rows
 // 792..2087 of 2880 (full width). Like the original server, positions are
 // pre-mapped so the receiver's plain x*w, y*h mapping lands them on the floor.
@@ -64,7 +69,6 @@ void setup() {
   else OS = "linux";
   println("OS: " + OS);
 
-  frameRate(30);
   try {
     tuioSender = new OSCPortOut(InetAddress.getByName(TUIO_DEST_IP), TUIO_PORT);
   } catch (Exception e) {
@@ -96,7 +100,11 @@ void draw() {
     }
   }
 
-  sendTuioFrame();
+  if (millis() >= nextTuioSendAt) {
+    sendTuioFrame();
+    nextTuioSendAt += (long) TUIO_SEND_INTERVAL;
+    if (nextTuioSendAt < millis()) nextTuioSendAt = millis() + (long) TUIO_SEND_INTERVAL; // re-sync after stalls
+  }
   drawViz();
 }
 

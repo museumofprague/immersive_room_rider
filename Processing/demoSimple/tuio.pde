@@ -1,0 +1,65 @@
+// TUIO input tab. Receives TUIO/OSC on the port below (sender at 192.168.0.64
+// must be configured to transmit UDP to this machine on that port).
+// Cursors only: objects and blobs are not handled.
+
+import TUIO.*;
+
+final int TUIO_PORT = 3333;
+TuioProcessing tuioClient;
+java.util.HashMap<Long, Integer> cursorColors = new java.util.HashMap<Long, Integer>();
+
+void setupTuio() {
+  tuioClient = new TuioProcessing(this, TUIO_PORT);
+}
+
+// called from main draw() while inside canvas.beginDraw()/endDraw()
+void drawTuio(PGraphics g) {
+  if (tuioClient == null) return;
+
+  // cursors: circle + trail, random color per session id, 5px stroke, id label
+  g.strokeWeight(10);
+  for (TuioCursor tcur : tuioClient.getTuioCursorList()) {
+    Long key = tcur.getSessionID();
+    Integer stored = cursorColors.get(key);
+    color c;
+    if (stored == null) {
+      c = color(random(80, 255), random(80, 255), random(80, 255));
+      cursorColors.put(key, c);
+    } else {
+      c = stored;
+    }
+
+    java.util.List<TuioPoint> path = tcur.getPath();
+    g.stroke(255);
+    for (int i = 1; i < path.size(); i++) {
+      TuioPoint p0 = path.get(i - 1);
+      TuioPoint p1 = path.get(i);
+      g.line(p0.getX() * g.width, p0.getY() * g.height, p1.getX() * g.width, p1.getY() * g.height);
+    }
+
+    g.stroke(255);
+    g.fill(c);
+    float d = g.height * 0.05;
+    float cx = tcur.getX() * g.width;
+    float cy = tcur.getY() * g.height;
+    g.ellipse(cx, cy, d, d);
+
+    g.fill(255);
+    g.textSize(g.height * 0.03);
+    g.textAlign(CENTER, CENTER);
+    g.text(str(tcur.getCursorID()), cx, cy);
+  }
+}
+
+void addTuioCursor(TuioCursor tcur) {
+  println("add cur " + tcur.getCursorID() + " (" + tcur.getX() + ", " + tcur.getY() + ")");
+}
+
+void updateTuioCursor(TuioCursor tcur) { }
+
+void removeTuioCursor(TuioCursor tcur) {
+  cursorColors.remove(tcur.getSessionID());
+  println("del cur " + tcur.getCursorID());
+}
+
+void refresh(TuioTime bundleTime) { redraw(); }
