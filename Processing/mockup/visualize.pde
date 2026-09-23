@@ -6,7 +6,8 @@
 //
 // LazyGui controls:
 //   Show TUIO - bake simulated walker cursors onto the floor over the Spout image
-//   Receiver   - Spout/Syphon (native GPU share) or NDI
+//   Receiver   - Spout/Syphon (native GPU share) or NDI; all three attach to
+//                the first sender found
 //   3D        - orbit 3D room vs flat 2D texture in the viewport
 //   Mode      - simulated walkers vs. mouse-dragging a TUIO cursor on the floor
 
@@ -16,8 +17,6 @@ import peasy.*;
 import peasy.CameraState;
 import ndi.stream.*;
 import java.util.Arrays;
-
-final String SENDER_NAME = "processing_demospace";
 
 // room geometry in meters (matches pharus observation space + wall px pitch)
 final float ROOM_W = SPACE_W;                          // 21.842 floor/wall width
@@ -31,6 +30,7 @@ final float V_FLOOR_BOT = 2087.0 / TEX_ROWS;
 final float V_WALL_B_TOP = 2879.0 / TEX_ROWS;
 
 Spout spoutRecv;
+long spoutLastRetry = 0;
 PImage spoutImg;
 PImage uvFallback; // data/uv_texture.png: shown on the room quads until a sender appears
 int fpsFrames = 0;
@@ -65,36 +65,61 @@ void setupViz() {
   gui = new LazyGui(this);
   if (OS.equals("windows")) {
     try {
+      // connect in receiveNative retries: binds to the first sender sharing
       spoutRecv = new Spout(this);
-      if (!spoutRecv.createReceiver(SENDER_NAME)) {
-        println("Spout: sender '" + SENDER_NAME + "' not found yet");
-      }
     } catch (Throwable e) {
       println("Spout init failed: " + e);
       spoutRecv = null;
     }
-  } else if (OS.equals("macos")) {
-    setupSyphonReceiver();
   }
+  // macOS Syphon: no eager client here - receiveNative runs background
+  // discovery and subscribes to the first server found
 }
 
 // Syphon (macOS) via reflection so the sketch still compiles on Windows,
-// where the Syphon library is not installed
+// where the Syphon library is not installed.
+// Discovery of available servers runs on a worker thread (the library's
+// listServers() blocks ~0.5s) and picks the FIRST server; the client then
+// subscribes to that name.
 Object syphonClient;
 java.lang.reflect.Method syphonGetImage;
+String syphonSubscribed;
+volatile String syphonDiscovered;
+volatile boolean syphonScanRunning;
+long syphonLastScan = 0;
 
-void setupSyphonReceiver() {
+void startSyphonScan() {
+  syphonScanRunning = true;
+  new Thread(() -> {
+    String found = null;
+    try {
+      Class<?> c = Class.forName("codeanticode.syphon.SyphonClient");
+      java.util.HashMap<String, String>[] servers =
+        (java.util.HashMap<String, String>[]) c.getMethod("listServers").invoke(null);
+      for (java.util.HashMap<String, String> s : servers) {
+        String name = s.get("ServerName");
+        if (name != null) { found = name; break; }
+      }
+    } catch (Throwable t) {
+      // keep previous discovery result
+    }
+    if (found != null) syphonDiscovered = found;
+    syphonScanRunning = false;
+  }, "syphon-scan").start();
+}
+
+void setupSyphonReceiver(String serverName) {
   try {
     Class<?> c = Class.forName("codeanticode.syphon.SyphonClient");
     // 3-arg form with null appName = subscribe by SERVER NAME only.
     // NOTE: the 2-arg constructor sets the APP name, not the server name!
     syphonClient = c.getConstructor(PApplet.class, String.class, String.class)
-                    .newInstance(this, null, SENDER_NAME);
+                    .newInstance(this, null, serverName);
     syphonGetImage = c.getMethod("getImage", PImage.class);
     syphonActiveM = c.getMethod("active");
     syphonNewFrameM = c.getMethod("newFrame");
-    // NB: no listServers() here - it sleeps up to 500ms on the main thread;
-    // discovery happens via the client re-created in the receiveNative retry
+    syphonSubscribed = serverName;
+    println("Syphon client for: " + serverName);
   } catch (Throwable e) {
     Throwable c = e.getCause() != null ? e.getCause() : e;
     c.printStackTrace();
@@ -102,6 +127,7 @@ void setupSyphonReceiver() {
     syphonGetImage = null;
   }
 }
+
 
 // --- GUI state (read once per frame, before simulation update) ---
 
@@ -129,6 +155,37 @@ void receiveTexture() {
 NDIReceiver ndiReceiver;
 NDIVideoFrame ndiFrame;
 long ndiLastTry = 0;
+// discovery+connect run on a worker thread: NDIFinder startup and
+// waitForSources() can block for seconds and must never touch the draw thread.
+// The finder is created once and kept alive; its native mDNS browser keeps
+// discovering between retries.
+NDIFinder ndiFinder;
+volatile boolean ndiConnecting = false;
+
+void startNdiConnect() {
+  ndiConnecting = true;
+  new Thread(() -> {
+    try {
+      if (ndiFinder == null) ndiFinder = new NDIFinder();
+      NDISource[] srcs = ndiFinder.getCurrentSources();
+      if (srcs.length == 0) {
+        ndiFinder.waitForSources(1500);
+        srcs = ndiFinder.getCurrentSources();
+      }
+      if (srcs.length > 0 && ndiReceiver != null && ndiReceiver.getConnectionCount() < 1) {
+        ndiReceiver.connect(srcs[0]);
+        println("NDI connected: " + srcs[0].getSourceName());
+      }
+    } catch (Exception e) {
+      if (millis() - ndiLastRetryPrint > 2000) {
+        ndiLastRetryPrint = millis();
+        println("NDI connect failed: " + e);
+      }
+    } finally {
+      ndiConnecting = false;
+    }
+  }, "ndi-connect").start();
+}
 
 void receiveNDI() {
   try {
@@ -137,23 +194,10 @@ void receiveNDI() {
       ndiReceiver = new NDIReceiver(NDIReceiver.ColorFormat.BGRX_BGRA, 100, false, "mockup");
       ndiFrame = new NDIVideoFrame();
     }
-    if (ndiReceiver.getConnectionCount() < 1 && millis() - ndiLastTry > 2000) {
+    if (ndiReceiver.getConnectionCount() < 1 && !ndiConnecting
+        && millis() - ndiLastTry > 2000) {
       ndiLastTry = millis();
-      try (NDIFinder finder = new NDIFinder()) {
-        NDISource[] srcs = finder.getCurrentSources();
-        if (srcs.length == 0) {
-          finder.waitForSources(1500);
-          srcs = finder.getCurrentSources();
-        }
-        if (srcs.length > 0) {
-          NDISource pick = srcs[0];
-          for (NDISource s : srcs) {
-            if (s.getSourceName().contains(SENDER_NAME)) { pick = s; break; }
-          }
-          ndiReceiver.connect(pick);
-          println("NDI connected: " + pick.getSourceName());
-        }
-      }
+      startNdiConnect();
     }
     NDIFrameType ft = ndiReceiver.receiveCapture(ndiFrame, null, null, 0);
     if (ft == NDIFrameType.VIDEO) {
@@ -178,6 +222,7 @@ long ndiLastRetryPrint = 0;
 void stop() {
   if (ndiFrame != null) ndiFrame.close();
   if (ndiReceiver != null) ndiReceiver.close();
+  if (ndiFinder != null) ndiFinder.close();
 }
 
 boolean syphonWasActive = false;
@@ -186,17 +231,29 @@ java.lang.reflect.Method syphonActiveM, syphonNewFrameM;
 
 void receiveNative() {
   if (OS.equals("macos")) {
-    if (syphonGetImage == null) return;
+    // background discovery: first server found wins
+    if (!syphonScanRunning && millis() - syphonLastScan > 2000) {
+      syphonLastScan = millis();
+      startSyphonScan();
+    }
+    String want = syphonDiscovered;
+    if (want == null) return;
+    if (syphonGetImage == null || !want.equals(syphonSubscribed)) {
+      if (syphonClient != null) {
+        try { syphonClient.getClass().getMethod("stop").invoke(syphonClient); } catch (Exception e) {}
+      }
+      setupSyphonReceiver(want);
+      return;
+    }
     try {
-      // the client only looks up the server at construction; re-create it until
-      // the demoSpace server appears (mockup may start first)
       boolean active = (Boolean) syphonActiveM.invoke(syphonClient);
       if (active && !syphonWasActive) println("Syphon client active");
       syphonWasActive = active;
       if (!active && millis() - syphonLastRetry > 2000) {
+        // server gone/restarted: rebuild the client for the same name
         syphonLastRetry = millis();
         try { syphonClient.getClass().getMethod("stop").invoke(syphonClient); } catch (Exception e) {}
-        setupSyphonReceiver();
+        setupSyphonReceiver(want);
       }
       if (!active) return;
       // getImage(dest) needs a destination buffer of matching size
@@ -216,7 +273,18 @@ void receiveNative() {
     }
     return;
   }
-  if (spoutRecv == null || !spoutRecv.isConnected()) return;
+  // Windows/Spout: exact name first, then any first sender; retry every 2 s
+  if (spoutRecv == null) return;
+  if (!spoutRecv.isConnected()) {
+    if (millis() - spoutLastRetry > 2000) {
+      spoutLastRetry = millis();
+      // JSPOUT treats an empty name as "first sender that is sharing";
+      // setSenderName("") first because createReceiver("") substitutes it
+      spoutRecv.setSenderName("");
+      if (spoutRecv.createReceiver("")) println("Spout connected to: " + spoutRecv.getSenderName());
+    }
+    return;
+  }
   int sw = spoutRecv.getSenderWidth();
   int sh = spoutRecv.getSenderHeight();
   if (sw <= 0 || sh <= 0) return;
@@ -306,29 +374,9 @@ void drawViz() {
     fpsLastMillis = millis();
     fpsFrames = 0;
   }
-
-  // LazyGui + PeasyCam integration pattern: draw GUI screen-space via HUD,
-  // and let the GUI eat mouse input before the camera
-  cam.beginHUD();
-  gui.draw();
-  fill(255);
-  noStroke();
-  textAlign(RIGHT, TOP);
-  textSize(14);
-  text(nf((float) fpsShown, 2, 0) + " fps", width - 10, 8);
-  cam.endHUD();
-  cam.setMouseControlled(use3D && gui.isMouseOutsideGui());
 }
 
 void draw3DRoom(PImage face) {
-  // when the GUI holds the mouse, PeasyCam is inactive and stops applying its
-  // camera -> re-apply the frozen camera manually, else the scene falls back
-  // to the pixel-scale default and vanishes
-  if (!cam.isActive()) {
-    float[] e = cam.getPosition();
-    float[] l = cam.getLookAt();
-    camera(e[0], e[1], e[2], l[0], l[1], l[2], 0, 1, 0);
-  }
   background(25);
   noLights();
   // room is meter-scale (~22 m) but the P3D default frustum is pixel-scale
@@ -384,8 +432,9 @@ void draw3DRoom(PImage face) {
 }
 
 void draw2DFlat(PImage face) {
-  cam.setActive(false); // stop PeasyCam consuming the mouse in 2D mode
-  camera(); // reset to default camera after PeasyCam's pre-draw update
+  // draw under the HUD's default camera: endHUD restores PeasyCam's matrix,
+  // so toggling back to 3D resumes seamlessly and PeasyCam is untouched in 2D
+  cam.beginHUD();
   background(25);
   noLights();
   if (face != null) image(face, 0, 0, width, height);
@@ -395,6 +444,7 @@ void draw2DFlat(PImage face) {
     text("Waiting for sender", width / 2, height / 2);
   }
   if (showTUIO) drawWalkers2D(width, height);
+  cam.endHUD();
 }
 
 // --- mouse mode: drag a TUIO cursor on the floor ---

@@ -763,6 +763,11 @@
           "className": "FolderNode",
           "path": "saves/autosave rules",
           "type": "FOLDER"
+        },
+        {
+          "className": "SaveItemNode",
+          "path": "saves/auto",
+          "type": "TRANSIENT"
         }
       ],
       "className": "SaveFolderNode",
@@ -776,21 +781,27 @@
       "type": "VALUE"
     },
     {
-      "valueString": "Syphon",
+      "valueString": "NDI",
       "children": [
         {
-          "valueBoolean": true,
+          "valueBoolean": false,
           "className": "RadioItemNode",
           "path": "Receiver/Syphon",
           "type": "TRANSIENT"
         },
         {
-          "valueBoolean": false,
+          "valueBoolean": true,
           "className": "RadioItemNode",
           "path": "Receiver/NDI",
           "type": "TRANSIENT"
         }
       ],
+      "window": {
+        "posX": 264.0,
+        "posY": 22.0,
+        "closed": false,
+        "windowSizeX": 154.0
+      },
       "className": "RadioFolderNode",
       "path": "Receiver",
       "type": "FOLDER"
@@ -824,7 +835,7 @@
     {
       "children": [
         {
-          "stringValue": "23:43:49  enter id 788 at (00.40, 04.95)\n23:43:49  leave id 784\n23:43:47  enter id 787 at (20.75, 00.40)\n23:43:44  enter id 786 at (20.75, 00.40)\n23:43:43  leave id 783",
+          "stringValue": "00:14:40  enter id 11 at (20.75, 00.40)\n00:14:38  enter id 10 at (20.75, 00.40)\n00:14:38  leave id 7\n00:14:35  enter id 9 at (20.75, 00.40)\n00:14:33  leave id 6",
           "className": "TextNode",
           "path": "logs/TUIO logs",
           "type": "VALUE"

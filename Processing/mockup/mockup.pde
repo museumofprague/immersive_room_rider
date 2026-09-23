@@ -71,7 +71,8 @@ void setup() {
 
   try {
     tuioSender = new OSCPortOut(InetAddress.getByName(TUIO_DEST_IP), TUIO_PORT);
-  } catch (Exception e) {
+  }
+  catch (Exception e) {
     println("TUIO sender init failed: " + e);
     exit();
   }
@@ -106,6 +107,19 @@ void draw() {
     if (nextTuioSendAt < millis()) nextTuioSendAt = millis() + (long) TUIO_SEND_INTERVAL; // re-sync after stalls
   }
   drawViz();
+
+
+  // LazyGui + PeasyCam integration pattern: draw GUI screen-space via HUD,
+  // and let the GUI eat mouse input before the camera
+  cam.beginHUD();
+  gui.draw();
+  fill(255);
+  noStroke();
+  textAlign(RIGHT, TOP);
+  textSize(14);
+  text(nf((float) fpsShown, 2, 0) + " fps", width - 10, 8);
+  cam.endHUD();
+  cam.setMouseControlled(use3D && gui.isMouseOutsideGui());
 }
 
 void spawnWalker() {
@@ -131,10 +145,11 @@ void sendTuioFrame() {
     for (Walker w : walkers) {
       tuioSender.send(new OSCMessage(TUIO_ADDR, new Object[] {
         "set", w.id, w.nx(), w.ny(), w.nvx(), w.nvy(), 0.0f
-      }));
+        }));
     }
     tuioSender.send(msg("fseq", frameId));
-  } catch (Exception e) {
+  }
+  catch (Exception e) {
     println("TUIO send failed: " + e);
   }
   frameId++;
@@ -146,7 +161,8 @@ void sendAlive() {
   for (int i = 0; i < walkers.size(); i++) args[i + 1] = walkers.get(i).id;
   try {
     tuioSender.send(new OSCMessage(TUIO_ADDR, args));
-  } catch (Exception e) {
+  }
+  catch (Exception e) {
     println("TUIO send failed: " + e);
   }
 }
@@ -200,9 +216,17 @@ class Walker {
   }
 
   // normalized TUIO coordinates, mapped into the floor band (see FLOOR_TUIO_Y*)
-  float nx()  { return x / SPACE_W; }
-  float ny()  { return FLOOR_TUIO_Y0 + (1.0 - y / SPACE_H) * (FLOOR_TUIO_Y1 - FLOOR_TUIO_Y0); }
+  float nx() {
+    return x / SPACE_W;
+  }
+  float ny() {
+    return FLOOR_TUIO_Y0 + (1.0 - y / SPACE_H) * (FLOOR_TUIO_Y1 - FLOOR_TUIO_Y0);
+  }
   // velocities in the same normalized units (y axis is flipped by the mapping)
-  float nvx() { return vx / SPACE_W; }
-  float nvy() { return -vy / SPACE_H * (FLOOR_TUIO_Y1 - FLOOR_TUIO_Y0); }
+  float nvx() {
+    return vx / SPACE_W;
+  }
+  float nvy() {
+    return -vy / SPACE_H * (FLOOR_TUIO_Y1 - FLOOR_TUIO_Y0);
+  }
 }
