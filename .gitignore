@@ -1,1 +1,6 @@
 .DS_Store
+*.DS_Store
+Processing/mockup/linux-amd64
+Processing/mockup/macos-aarch64
+Processing/mockup/macos-x86_64
+Processing/mockup/windows-amd64
