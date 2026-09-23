@@ -28,7 +28,7 @@ We are using [Pixera media server](https://pixera.one/en/) for projector blendin
 * video codec (HAP) / NotchLC (preffered)
 * accepts NDI streams if you need real-time video
 
-Output three NDI streams from your app - one for each wall, one for floor or you can send one large video that we can split between the walls and floor. We can also mirror the content to other walls / floor (for example you can output just single stream for walls and one for floor if you don't mind same video on both walls). 
+Output three NDI streams from your app - one for each wall, one for floor or you can send one large video that we can split between the walls and floor ( this is preferred and simplest ). We can also mirror the content to other walls / floor (for example you can output just single stream for walls and one for floor if you don't mind same video on both walls). 
 
 In case you can't output NDI, you can use Spout:
 * https://spout.zeal.co/
@@ -46,12 +46,8 @@ Unfortunetly, FFmpeg’s built-in SpeedHQ decoder does NOT support SHQ7 (YUVA422
 ##### OBS
 You can use free [OBS software](https://obsproject.com/) along with [NDI plugin for OBS](https://github.com/DistroAV/DistroAV/releases) to record NDI streams. Better yet, OBS also supports the direct Spout capture. Unfortunetly, you might be limited by avaliable max resolution inside OBS based on current diplay setting and GPU.
 
-##### Spout Recording only
-* Another option is to use [LightJams Spout recorder](https://www.lightjams.com/spout-recorder.html) for capturing Spout stream. 
-* One more worth looking into is open source [SpoutRecorder](https://github.com/leadedge/SpoutRecorder/). 
-
 #### Preffered video CODEC
-The best quality is achieved using NotchLC codec. The second, slightly worse option is HAP. If you can render to NotchLC. Info about HAP is below. Pixera server that is installed on the main server PC have built-in capability to [encode to NotchLC](https://help.pixera.one/pixera-251/notch-lc-encoding), NotchLC also provides [plugins](https://www.notch.one/downloads) for Adobe Premiere / After effects / Encoder that can be used. 
+The best quality is achieved using NotchLC codec. The second, slightly worse option is HAP. If you can, render to NotchLC. Info about HAP is below. Pixera server that is installed on the main server PC have built-in capability to [encode to NotchLC](https://help.pixera.one/pixera-251/notch-lc-encoding), NotchLC also provides [plugins](https://www.notch.one/downloads) for Adobe Premiere / After effects / Encoder that can be used. 
 
 #### Convert Video to HAP codec
 
@@ -74,7 +70,7 @@ We can provide you with spatial audio realtime engine. The system expects OSC me
 
 ## Interactivity
 * READY We have about 50 ipads 11 tablets at our disposal for interactive input from users (surveys, drawing, games). We can run websocket and https server at the control PC that can be reached from iPads using local WiFi. This way we can have multiplayer, real-time input and show output on large scale video projection. 
-* IN PROGRESS We are also currently working on implementing Lidar sensors that will track the users movement in the immersive room (2D, feet positions).
+* READY There are Lidar sensors along the walls that track the users movement in the immersive room (2D, feet positions) and send the positions using [TUIO protocol](https://www.tuio.org/) on port 3333 that you can recieve.
 * IN PROGRESS We are working on implementing realtime spatial audio engine.  
 
 
@@ -95,12 +91,15 @@ picoScan 150 Specs:
 * 276 Degree Angle
 * 1 Degree Res
 
+## Testing
+The mockup app provides you a way to visualize sent texture in 3D and test tracking API without any room hardware ( download binary from [releases]([./releases](https://github.com/museumofprague/immersive_room_rider/releases) ).
+
 ## Touchdesigner Templates
 WIP
 
 ### Processing template
 
-Two example sketches in [`Processing/`](./Processing) demonstrate the full realtime pipeline (texture sharing + lidar tracking) without any room hardware.
+Multiple example sketches are provided in [`Processing/`](./Processing). DemoSpace demonstrate the full realtime pipeline (texture sharing + lidar tracking + OSC) and demoSimple shows simple 2D output with tracking API implemented and Spout output in a single texture (start there).
 
 #### Required libraries
 
