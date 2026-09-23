@@ -92,7 +92,7 @@ picoScan 150 Specs:
 * 1 Degree Res
 
 ## Testing
-The mockup app provides you a way to visualize sent texture in 3D and test tracking API without any room hardware ( download binary from [releases]([./releases](https://github.com/museumofprague/immersive_room_rider/releases) ).
+The mockup app provides you a way to visualize sent texture in 3D and test tracking API without any room hardware ( download binary from [releases](https://github.com/museumofprague/immersive_room_rider/releases) ).
 
 ## Touchdesigner Templates
 WIP
