@@ -32,6 +32,7 @@ final float V_WALL_B_TOP = 2879.0 / TEX_ROWS;
 
 Spout spoutRecv;
 PImage spoutImg;
+PImage uvFallback; // data/uv_texture.png: shown on the room quads until a sender appears
 int fpsFrames = 0;
 long fpsLastMillis = 0;
 double fpsShown = 0;
@@ -49,6 +50,7 @@ Walker dragWalker;
 java.util.HashMap<Long, Integer> walkerColors = new java.util.HashMap<Long, Integer>();
 
 void setupViz() {
+  uvFallback = flipY(loadImage("uv_texture.png")); // chart authored V-up; sampling expects demoSpace row layout
   // per-frame-updated textures keep a stale mip chain in P3D; without this,
   // downsampled textured quads sample empty mips and render nearly invisible
   hint(DISABLE_TEXTURE_MIPMAPS);
@@ -270,6 +272,18 @@ color walkerColor(int id) {
   return c;
 }
 
+// vertical mirror: row y of src -> row (h-1-y) of dst
+PImage flipY(PImage src) {
+  src.loadPixels();
+  PImage dst = createImage(src.width, src.height, src.format);
+  dst.loadPixels();
+  for (int y = 0; y < src.height; y++) {
+    arraycopy(src.pixels, (src.height - 1 - y) * src.width, dst.pixels, y * src.width, src.width);
+  }
+  dst.updatePixels();
+  return dst;
+}
+
 // --- viewport ---
 
 void drawViz() {
@@ -329,9 +343,11 @@ void draw3DRoom(PImage face) {
   float hw = ROOM_W / 2.0;
   float hd = ROOM_D / 2.0;
 
-  // one texture (the full merged face), sampled per surface via uv row bands
+  // one texture (the full merged face), sampled per surface via uv row bands;
+  // uv fallback keeps the quads readable (and the uv layout visible) pre-connect
+  PImage tex = face != null ? face : uvFallback;
   beginShape(QUADS);
-  if (face != null) texture(face);
+  if (tex != null) texture(tex);
   // left/top wall region (rows 0..792): junction row 792 at floor edge z=+hd,
   // row 0 at the wall top
   vertex(-hw, 0, hd, 0, V_FLOOR_TOP);
@@ -352,10 +368,10 @@ void draw3DRoom(PImage face) {
   vertex(-hw, -WALL_H, -hd, 0, V_WALL_B_TOP);
   endShape();
 
-  if (showTUIO && face != null) drawWalkers3D();
+  if (showTUIO) drawWalkers3D();
 
   // room outline for orientation
-  if (face != null) noTexture();
+  if (tex != null) noTexture();
   noFill();
   stroke(120);
   strokeWeight(1);
