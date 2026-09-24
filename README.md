@@ -95,7 +95,13 @@ picoScan 150 Specs:
 The mockup app provides you a way to visualize sent texture in 3D and test tracking API without any room hardware ( download binary from [releases](https://github.com/museumofprague/immersive_room_rider/releases) ).
 
 ## Touchdesigner Templates
-WIP
+WIP - Planned, approx end of the 2026 or start 2027.
+
+## VVVV Templates
+WIP - Planned, approx end of the 2026 or start 2027.
+
+## Unity Templates
+WIP - Planned, approx end of the 2026 or start 2027.
 
 ### Processing template
 
