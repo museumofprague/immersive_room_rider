@@ -4,10 +4,10 @@ We are providing technical details on how to prepare audio visual content for th
 <table>
   <tr>
     <td>
-      <img src="./assets/space_empty.png" width="100%" />
+      <img src="./assets/space_empty.jpg" width="100%" />
     </td>
     <td rowspan="2">
-      <img src="./assets/space_videomapping_2.png" width="100%" />
+      <img src="./assets/space_videomapping_2.jpg" width="100%" />
     </td>
   </tr>
   <tr>
@@ -67,6 +67,8 @@ We can provide you with spatial audio realtime engine. The system expects OSC me
 
 ## Dimensions
 6.998 * 18 meters
+
+<img src="./assets/immersive_space_layout.png" width="100%" />
 
 ## Interactivity
 * READY We have about 50 ipads 11 tablets at our disposal for interactive input from users (surveys, drawing, games). We can run websocket and https server at the control PC that can be reached from iPads using local WiFi. This way we can have multiplayer, real-time input and show output on large scale video projection. 
