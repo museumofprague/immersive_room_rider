@@ -36,18 +36,19 @@ void drawTuio(PGraphics g) {
     for (int i = start + 1; i < path.size(); i++) {
       TuioPoint p0 = path.get(i - 1);
       TuioPoint p1 = path.get(i);
-      g.line(p0.getX() * g.width, p0.getY() * g.height, p1.getX() * g.width, p1.getY() * g.height);
+      g.line(p0.getX() * regW[1] + regX[1], p0.getY() * regH[1] + regY[1],
+             p1.getX() * regW[1] + regX[1], p1.getY() * regH[1] + regY[1]);
     }
 
     g.stroke(255);
     g.fill(c);
-    float d = g.height * 0.05;
-    float cx = tcur.getX() * g.width;
-    float cy = tcur.getY() * g.height;
+    float d = regH[1] * 0.05;
+    float cx = tcur.getX() * regW[1] + regX[1];
+    float cy = tcur.getY() * regH[1] + regY[1];
     g.ellipse(cx, cy, d, d);
 
     g.fill(255);
-    g.textSize(g.height * 0.03);
+    g.textSize(regH[1] * 0.03);
     g.textAlign(CENTER, CENTER);
     g.text(str(tcur.getCursorID()), cx, cy);
   }
