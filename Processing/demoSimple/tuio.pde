@@ -5,6 +5,7 @@
 import TUIO.*;
 
 final int TUIO_PORT = 3333;
+final int TRAIL_POINTS = 50;
 TuioProcessing tuioClient;
 java.util.HashMap<Long, Integer> cursorColors = new java.util.HashMap<Long, Integer>();
 
@@ -30,8 +31,9 @@ void drawTuio(PGraphics g) {
     }
 
     java.util.List<TuioPoint> path = tcur.getPath();
+    int start = max(0, path.size() - TRAIL_POINTS);
     g.stroke(255);
-    for (int i = 1; i < path.size(); i++) {
+    for (int i = start + 1; i < path.size(); i++) {
       TuioPoint p0 = path.get(i - 1);
       TuioPoint p1 = path.get(i);
       g.line(p0.getX() * g.width, p0.getY() * g.height, p1.getX() * g.width, p1.getY() * g.height);
@@ -62,4 +64,6 @@ void removeTuioCursor(TuioCursor tcur) {
   println("del cur " + tcur.getCursorID());
 }
 
-void refresh(TuioTime bundleTime) { redraw(); }
+// must exist for the TUIO library, intentionally empty: redraw() here runs
+// on the network thread and contends with the continuous draw loop
+void refresh(TuioTime bundleTime) { }
