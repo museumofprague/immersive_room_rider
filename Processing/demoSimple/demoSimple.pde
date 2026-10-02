@@ -40,7 +40,7 @@ PGraphics canvas2D;  // P2D shared space, Spout source
 Spout sender;
 
 String OS; // "windows", "macos", "linux"
-final String SENDER_NAME = "processing_demosimple";
+final String SENDER_NAME = "processing_demospace";
 
 int fpsFrames = 0;
 long fpsLastMillis = 0;
