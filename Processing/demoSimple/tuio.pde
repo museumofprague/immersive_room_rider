@@ -5,7 +5,7 @@
 import TUIO.*;
 
 final int TUIO_PORT = 3333;
-final int TRAIL_POINTS = 50;
+final int TRAIL_POINTS = 100;
 TuioProcessing tuioClient;
 java.util.HashMap<Long, Integer> cursorColors = new java.util.HashMap<Long, Integer>();
 
