@@ -28,7 +28,7 @@ We are using [Pixera media server](https://pixera.one/en/) for projector blendin
 * video codec (HAP) / NotchLC (preffered)
 * accepts NDI streams if you need real-time video
 
-You can output single NDI stream texture 4096 x 2880 (width × height) that we offset inside Pixera (our scope) to three surfaces - wall, floor, wall (this simplest and preferred). Alternatively you can also output three NDI streams from your app - one for each wall, one for floor. We can also mirror the content to other walls / floor (for example you can output just single stream for walls and one for floor if you don't mind same video on both walls). 
+You can output single NDI stream texture 4096 x 2880 (width × height) that we offset inside Pixera (our scope) to three surfaces - wall, floor, wall (this simplest and preferred). Note that lower resolution is used for better real-time performance, higher or even native resolution can be used, but there will be significant overhead from encoding into NDI stream plus your rendering pipeline and decoding on the server so the framerate might drop - in case of realtime content we prefer smooth playback to resolution, for the highest quality, prerecorded content is needed. Alternatively you can also output three NDI streams from your app - one for each wall, one for floor. We can also mirror the content to other walls / floor (for example you can output just single stream for walls and one for floor if you don't mind same video on both walls). 
 
 In case you can't output NDI, you can use Spout:
 * https://spout.zeal.co/
