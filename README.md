@@ -67,8 +67,8 @@ Speaker positions are provided in normalized coordinates from -1 to +1 with a ce
 
 I have just released a pull request for my fork of processing sound that includes ASIO support for windows + completely new library that supports ambisonics in Processing as well and works together with standard processing sound library.
 
-https://github.com/trackme518/ResonanceSpatialAudio
-https://github.com/processing/processing-sound/pull/113
+* https://github.com/trackme518/ResonanceSpatialAudio
+* https://github.com/processing/processing-sound/pull/113
 
 Give it a star if you like it 🙂. 
 
