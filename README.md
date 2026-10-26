@@ -63,7 +63,18 @@ We have 12.4 2D speaker layout but we are effectively using 12.1 (all 4 subwoofe
 Speaker positions are provided in normalized coordinates from -1 to +1 with a centroid at (0,0). 
 * [speaker_layout](https://github.com/museumofprague/immersive_room_rider/blob/main/speaker_preset/muzeum_prahy.json) 
 
-We can provide you with spatial audio realtime engine. The system expects OSC messages with virtual audio sources positions and it will calculate needed volumes for all speakers to create an illusion of the sound coming from given direction. 
+### Realtime Spatial Audio
+
+I have just released a pull request for my fork of processing sound that includes ASIO support for windows + completely new library that supports ambisonics in Processing as well and works together with standard processing sound library.
+
+https://github.com/trackme518/ResonanceSpatialAudio
+https://github.com/processing/processing-sound/pull/113
+
+Give it a star if you like it 🙂. 
+
+These two things together should enable pushing spatial audio directly from Processing to speakers without additional DAW. It even supports basic room reflections. It needs to be tested. 
+
+From DAW / FMOD / Unity - what you want is AIIRAD decoder (we recommend IEM Spatial Audio Suite VSTs plugins ) based on speaker layout and their channels and then push to ASIO sound card. More directions and guidelines are coming after more testing and templates will be released. 
 
 ## Dimensions
 6.998 * 18 meters
