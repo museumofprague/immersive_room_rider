@@ -132,6 +132,26 @@ void draw() {
   }
   canvas2D.noStroke();
 
+  // wall labels on the surface regions (left wall = index 0, right wall = index 2)
+  canvas2D.fill(255);
+  canvas2D.textAlign(CENTER, CENTER);
+
+  // left wall: drawn normally
+  canvas2D.pushMatrix();
+  canvas2D.textSize(regH[0] * 0.12);
+  canvas2D.text("Left wall", regX[0] + regW[0] / 2.0, regY[0] + regH[0] / 2.0);
+  canvas2D.popMatrix();
+
+  // right wall: the seamless texture is mapped onto the right wall flipped
+  // horizontally in Pixera (see notes above), so this label must be drawn
+  // mirrored here to appear upright/normal on the physical right wall (blue).
+  canvas2D.pushMatrix();
+  canvas2D.translate(regX[2] + regW[2] / 2.0, regY[2] + regH[2] / 2.0);
+  canvas2D.scale(-1, 1);
+  canvas2D.textSize(regH[2] * 0.12);
+  canvas2D.text("Right wall", 0, 0);
+  canvas2D.popMatrix();
+
   // 2D DEMO: a circle moving across all three regions. Its position is in
   // shared texture space, so it visibly crosses the borders.
   canvas2D.noFill();
