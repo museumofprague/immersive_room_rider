@@ -24,9 +24,9 @@ void drawTuio(PGraphics g) {
   g.fill(255, 120);
   for (TuioObject tobj : tuioClient.getTuioObjectList()) {
     g.pushMatrix();
-    g.translate(tobj.getX() * g.width, tobj.getY() * g.height);
+    g.translate(tobj.getX() * regW[1] + regX[1], tobj.getY() * regH[1] + regY[1]);
     g.rotate(tobj.getAngle());
-    float s = g.height * 0.1;
+    float s = regH[1] * 0.1;
     g.rect(-s / 2, -s / 2, s, s);
     g.popMatrix();
   }
@@ -71,9 +71,9 @@ void drawTuio(PGraphics g) {
   // blobs: rotated ellipse sized by width/height
   for (TuioBlob tblb : tuioClient.getTuioBlobList()) {
     g.pushMatrix();
-    g.translate(tblb.getX() * g.width, tblb.getY() * g.height);
+    g.translate(tblb.getX() * regW[1] + regX[1], tblb.getY() * regH[1] + regY[1]);
     g.rotate(tblb.getAngle());
-    g.ellipse(0, 0, tblb.getWidth() * g.width, tblb.getHeight() * g.height);
+    g.ellipse(0, 0, tblb.getWidth() * regW[1], tblb.getHeight() * regH[1]);
     g.popMatrix();
   }
 }
