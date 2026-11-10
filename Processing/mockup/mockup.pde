@@ -119,7 +119,7 @@ void draw() {
   textSize(14);
   text(nf((float) fpsShown, 2, 0) + " fps", width - 10, 8);
   cam.endHUD();
-  cam.setMouseControlled(use3D && gui.isMouseOutsideGui());
+
 }
 
 void spawnWalker() {

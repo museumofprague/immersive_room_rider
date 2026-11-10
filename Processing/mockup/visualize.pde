@@ -9,12 +9,12 @@
 //   Receiver   - Spout/Syphon (native GPU share) or NDI; all three attach to
 //                the first sender found
 //   3D        - orbit 3D room vs flat 2D texture in the viewport
-//   Mode      - simulated walkers vs. mouse-dragging a TUIO cursor on the floor
+//   Mode      - simulated walkers vs. a TUIO cursor on the floor
+//               (left-drag in 2D, Ctrl + left-drag with camera locked in 3D)
 
 import spout.*;
 import com.krab.lazy.*;
 import peasy.*;
-import peasy.CameraState;
 import ndi.stream.*;
 import java.util.Arrays;
 
@@ -37,15 +37,13 @@ int fpsFrames = 0;
 long fpsLastMillis = 0;
 double fpsShown = 0;
 PeasyCam cam;
-CameraState camDefaultView;
 LazyGui gui;
 
 boolean showTUIO, use3D, modeMouse;
-final String MODE_SIM = "Simulated walkers";
-final String MODE_MOUSE = "Mouse cursor";
 
 // mouse-driven cursor state
 boolean dragging = false;
+boolean modfierDown = false;
 Walker dragWalker;
 java.util.HashMap<Long, Integer> walkerColors = new java.util.HashMap<Long, Integer>();
 
@@ -55,19 +53,17 @@ void setupViz() {
   // downsampled textured quads sample empty mips and render nearly invisible
   hint(DISABLE_TEXTURE_MIPMAPS);
   cam = new PeasyCam(this, 22);
-  // PeasyCam's built-in double-click reset() always returns to its identity
-  // (side-on) state; instead disable it and restore our snapshotted default
-  // view via the library's own setState() on double-click (see mousePressed)
+  // PeasyCam's built-in reset returns to an invalid identity view for the room.
   cam.setResetOnDoubleClick(false);
   cam.rotateY(-PI / 6.0); // default: slight yaw
   cam.rotateX(PI / 5.0);  // ...and slightly from above
-  camDefaultView = cam.getState();
   gui = new LazyGui(this);
   if (OS.equals("windows")) {
     try {
       // connect in receiveNative retries: binds to the first sender sharing
       spoutRecv = new Spout(this);
-    } catch (Throwable e) {
+    }
+    catch (Throwable e) {
       println("Spout init failed: " + e);
       spoutRecv = null;
     }
@@ -98,14 +94,19 @@ void startSyphonScan() {
         (java.util.HashMap<String, String>[]) c.getMethod("listServers").invoke(null);
       for (java.util.HashMap<String, String> s : servers) {
         String name = s.get("ServerName");
-        if (name != null) { found = name; break; }
+        if (name != null) {
+          found = name;
+          break;
+        }
       }
-    } catch (Throwable t) {
+    }
+    catch (Throwable t) {
       // keep previous discovery result
     }
     if (found != null) syphonDiscovered = found;
     syphonScanRunning = false;
-  }, "syphon-scan").start();
+  }
+  , "syphon-scan").start();
 }
 
 void setupSyphonReceiver(String serverName) {
@@ -114,13 +115,14 @@ void setupSyphonReceiver(String serverName) {
     // 3-arg form with null appName = subscribe by SERVER NAME only.
     // NOTE: the 2-arg constructor sets the APP name, not the server name!
     syphonClient = c.getConstructor(PApplet.class, String.class, String.class)
-                    .newInstance(this, null, serverName);
+      .newInstance(this, null, serverName);
     syphonGetImage = c.getMethod("getImage", PImage.class);
     syphonActiveM = c.getMethod("active");
     syphonNewFrameM = c.getMethod("newFrame");
     syphonSubscribed = serverName;
     println("Syphon client for: " + serverName);
-  } catch (Throwable e) {
+  }
+  catch (Throwable e) {
     Throwable c = e.getCause() != null ? e.getCause() : e;
     c.printStackTrace();
     println("Syphon init failed: " + c);
@@ -136,14 +138,20 @@ void readGui() {
   String nativeLabel = OS.equals("macos") ? "Syphon" : "Spout";
   recvMode = gui.radio("Receiver", Arrays.asList(nativeLabel, "NDI"), nativeLabel);
   use3D = gui.toggle("3D", true);
-  modeMouse = gui.radio("Mode", Arrays.asList(MODE_SIM, MODE_MOUSE), MODE_SIM).equals(MODE_MOUSE);
+  gui.pushFolder("Mode");
+  modeMouse = gui.toggle("Mouse cursor", false);
+  gui.text("Mouse cursor help", "");
+  gui.textSet("Mouse cursor help", "2D: Left mouse drag\n3D: Alt + Left mouse drag\nCamera locks while held");
+  gui.popFolder();
 }
 
 // --- texture receive (native GPU share or NDI) ---
 
 String recvMode = "Spout";
 
-boolean useNDI() { return recvMode.equals("NDI"); }
+boolean useNDI() {
+  return recvMode.equals("NDI");
+}
 
 void receiveTexture() {
   if (useNDI()) receiveNDI();
@@ -176,15 +184,18 @@ void startNdiConnect() {
         ndiReceiver.connect(srcs[0]);
         println("NDI connected: " + srcs[0].getSourceName());
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       if (millis() - ndiLastRetryPrint > 2000) {
         ndiLastRetryPrint = millis();
         println("NDI connect failed: " + e);
       }
-    } finally {
+    }
+    finally {
       ndiConnecting = false;
     }
-  }, "ndi-connect").start();
+  }
+  , "ndi-connect").start();
 }
 
 void receiveNDI() {
@@ -195,7 +206,7 @@ void receiveNDI() {
       ndiFrame = new NDIVideoFrame();
     }
     if (ndiReceiver.getConnectionCount() < 1 && !ndiConnecting
-        && millis() - ndiLastTry > 2000) {
+      && millis() - ndiLastTry > 2000) {
       ndiLastTry = millis();
       startNdiConnect();
     }
@@ -210,7 +221,8 @@ void receiveNDI() {
       NDIUtilities.copyBufferToPixels(ndiFrame.getData(), spoutImg.pixels);
       spoutImg.updatePixels();
     }
-  } catch (Exception e) {
+  }
+  catch (Exception e) {
     if (millis() - ndiLastRetryPrint > 2000) {
       ndiLastRetryPrint = millis();
       println("NDI receive failed: " + e);
@@ -240,7 +252,11 @@ void receiveNative() {
     if (want == null) return;
     if (syphonGetImage == null || !want.equals(syphonSubscribed)) {
       if (syphonClient != null) {
-        try { syphonClient.getClass().getMethod("stop").invoke(syphonClient); } catch (Exception e) {}
+        try {
+          syphonClient.getClass().getMethod("stop").invoke(syphonClient);
+        }
+        catch (Exception e) {
+        }
       }
       setupSyphonReceiver(want);
       return;
@@ -252,7 +268,11 @@ void receiveNative() {
       if (!active && millis() - syphonLastRetry > 2000) {
         // server gone/restarted: rebuild the client for the same name
         syphonLastRetry = millis();
-        try { syphonClient.getClass().getMethod("stop").invoke(syphonClient); } catch (Exception e) {}
+        try {
+          syphonClient.getClass().getMethod("stop").invoke(syphonClient);
+        }
+        catch (Exception e) {
+        }
         setupSyphonReceiver(want);
       }
       if (!active) return;
@@ -264,7 +284,8 @@ void receiveNative() {
       if (!fresh) return;
       PImage res = (PImage) syphonGetImage.invoke(syphonClient, spoutImg);
       if (res != null) spoutImg = res;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       Throwable c = e.getCause() != null ? e.getCause() : e;
       if (millis() - syphonLastRetry > 2000) {
         syphonLastRetry = millis();
@@ -424,11 +445,11 @@ void draw3DRoom(PImage face) {
   stroke(120);
   strokeWeight(1);
   line(-hw, 0, hd, -hw, -WALL_H, hd);
-  line( hw, 0, hd,  hw, -WALL_H, hd);
-  line(-hw, -WALL_H, hd,  hw, -WALL_H, hd);
+  line( hw, 0, hd, hw, -WALL_H, hd);
+  line(-hw, -WALL_H, hd, hw, -WALL_H, hd);
   line(-hw, 0, -hd, -hw, -WALL_H, -hd);
-  line( hw, 0, -hd,  hw, -WALL_H, -hd);
-  line(-hw, -WALL_H, -hd,  hw, -WALL_H, -hd);
+  line( hw, 0, -hd, hw, -WALL_H, -hd);
+  line(-hw, -WALL_H, -hd, hw, -WALL_H, -hd);
 }
 
 void draw2DFlat(PImage face) {
@@ -449,20 +470,36 @@ void draw2DFlat(PImage face) {
 
 // --- mouse mode: drag a TUIO cursor on the floor ---
 
-void mousePressed() {
-  if (mouseEvent.getCount() == 2 && use3D && gui.isMouseOutsideGui()) {
-    cam.setState(camDefaultView, 300); // smooth back to default view
-    return;
+void keyPressed() {
+    if ( key == CODED && keyCode == ALT && modeMouse) {
+      modfierDown = true;
+      cam.setActive(false);
+      println("alt down");
   }
-  if (!modeMouse || !gui.isMouseOutsideGui() || mouseButton != LEFT) return;
-  PVector hit = rayToFloor(mouseX, mouseY);
-  if (hit == null) return;
-  PVector pos = new PVector(hit.x, hit.y);
-  dragWalker = new Walker(nextWalkerId++, pos, pos, pos);
-  dragWalker.frozen = true;
-  walkers.add(dragWalker);
-  dragging = true;
-  tuioLog("mouse cursor id " + dragWalker.id + " at (" + nf(hit.x, 2, 2) + ", " + nf(hit.y, 2, 2) + ")");
+}
+
+void keyReleased() {
+  if (key == CODED && keyCode == ALT ) {
+    modfierDown = false;
+    cam.setActive(true);
+    println("alt up");
+  }
+}
+
+void mousePressed() {
+  if (modeMouse && gui.isMouseOutsideGui() && modfierDown) {
+    println("walker sim");
+    //if (use3D) cam.setActive(false);
+
+    PVector hit = rayToFloor(mouseX, mouseY);
+    if (hit == null) return;
+    PVector pos = new PVector(hit.x, hit.y);
+    dragWalker = new Walker(nextWalkerId++, pos, pos, pos);
+    dragWalker.frozen = true;
+    walkers.add(dragWalker);
+    dragging = true;
+    tuioLog("mouse cursor id " + dragWalker.id + " at (" + nf(hit.x, 2, 2) + ", " + nf(hit.y, 2, 2) + ")");
+  }
 }
 
 void mouseDragged() {
@@ -486,40 +523,46 @@ void mouseReleased() {
   }
 }
 
-// Screen point -> floor plane (y=0) hit in observation coords (x, y in meters).
-// Camera basis from PeasyCam eye + lookAt (roll ignored), P3D default frustum.
+// Screen point -> floor in observation coords (x, y in meters).
+// 3D inverts the floor quad projected by Processing; 2D inverts its floor band.
 PVector rayToFloor(float mx, float my) {
-  float[] eye = cam.getPosition();
-  float[] la = cam.getLookAt();
-  double fx = la[0] - eye[0], fy = la[1] - eye[1], fz = la[2] - eye[2];
-  double fl = Math.max(1e-9, Math.sqrt(fx * fx + fy * fy + fz * fz));
-  fx /= fl; fy /= fl; fz /= fl;
+  if (!use3D) {
+    float floorTop = FLOOR_TUIO_Y0 * height;
+    float floorBottom = FLOOR_TUIO_Y1 * height;
+    if (mx < 0 || mx > width || my < floorTop || my > floorBottom) return null;
+    return new PVector(
+      map(mx, 0, width, 0, SPACE_W),
+      map(my, floorTop, floorBottom, SPACE_H, 0)
+      );
+  }
 
-  // right = fwd x worldUp(0,1,0); up = right x fwd
-  double rx = fz * 1 - 0, ry = 0, rz = -fx; // fwd x (0,1,0) = (fz, 0, -fx)
-  double rl = Math.max(1e-9, Math.sqrt(rx * rx + rz * rz));
-  rx /= rl; rz /= rl;
-  double ux = ry * fz - rz * fy;
-  double uy = rz * fx - rx * fz;
-  double uz = rx * fy - ry * fx;
+  float hw = ROOM_W / 2.0;
+  float hd = ROOM_D / 2.0;
+  // Project floor corners in the same camera view used to draw the room.
+  // Corner order: (u,v) = (0,0), (1,0), (1,1), (0,1).
+  float x0 = screenX(-hw, 0, hd), y0 = screenY(-hw, 0, hd);
+  float x1 = screenX( hw, 0, hd), y1 = screenY( hw, 0, hd);
+  float x2 = screenX( hw, 0, -hd), y2 = screenY( hw, 0, -hd);
+  float x3 = screenX(-hw, 0, -hd), y3 = screenY(-hw, 0, -hd);
 
-  double tanV = Math.tan(PI / 6.0);
-  double aspect = (double) width / height;
-  double sx = ((double) mx / width - 0.5) * 2.0 * tanV * aspect;
-  double sy = (0.5 - (double) my / height) * 2.0 * tanV;
-  double dirx = fx + rx * sx + ux * sy;
-  double diry = fy + ry * sx + uy * sy;
-  double dirz = fz + rz * sx + uz * sy;
-
-  if (Math.abs(diry) < 1e-6) return null;
-  double t = -eye[1] / diry; // plane y = 0
-  if (t <= 0) return null;
-
-  double wx = eye[0] + dirx * t;
-  double wz = eye[2] + dirz * t;
-
-  double obsX = wx + ROOM_W / 2.0;
-  double obsY = wz + ROOM_D / 2.0;
-  if (obsX < 0 || obsX > ROOM_W || obsY < 0 || obsY > ROOM_D) return null;
-  return new PVector((float) obsX, (float) obsY);
+  // Unit-square UV -> projected screen homography, then invert for the mouse.
+  float dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3;
+  float dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+  float denominator = dx1 * dy2 - dx2 * dy1;
+  if (abs(denominator) < 1e-6) return null;
+  float g = (dx3 * dy2 - dx2 * dy3) / denominator;
+  float h = (dx1 * dy3 - dx3 * dy1) / denominator;
+  PMatrix3D uvToScreen = new PMatrix3D(
+    x1 - x0 + g * x1, x3 - x0 + h * x3, 0, x0,
+    y1 - y0 + g * y1, y3 - y0 + h * y3, 0, y0,
+    0, 0, 1, 0,
+    g, h, 0, 1
+    );
+  if (!uvToScreen.invert()) return null;
+  float w = uvToScreen.multW(mx, my, 0);
+  if (w < 1e-6) return null;
+  float u = uvToScreen.multX(mx, my, 0) / w;
+  float v = uvToScreen.multY(mx, my, 0) / w;
+  if (u < 0 || u > 1 || v < 0 || v > 1) return null;
+  return new PVector(u * SPACE_W, (1 - v) * SPACE_H);
 }
