@@ -155,4 +155,4 @@ Test companion. It simulates the hardware side of the room:
 Run both sketches on one machine to verify the whole pipeline before deploying to the room PCs.
 
 ## Room 1
-Room 1 is located opossite to the immersive room (internally labeled as Room 5). Room 1 contains single screen with native resolution `6130 * 2160 px`.  For realtime applications use `3065 * 1080 px`. 
+Room 1 is located opossite to the immersive room (internally labeled as Room 5). Room 1 contains single screen with native resolution `6130 * 2160 px`.  For realtime applications use `3065 * 1080 px`. Room 1 screen is also served from Pixera media server from the same PC as Room 5. 
