@@ -153,3 +153,6 @@ Test companion. It simulates the hardware side of the room:
 * acts as a **Pixera-server stand-in**: receives the shared texture (pick `Spout` / `Syphon` or `NDI` in the *Receiver* radio in the GUI) and shows a 3D preview of the room (wall / floor / wall) with the texture mapped per region — orbit with mouse, double-click to reset the view, toggle flat 2D, walker overlay and transport at runtime
 
 Run both sketches on one machine to verify the whole pipeline before deploying to the room PCs.
+
+## Room 1
+Room 1 is located opossite to the immersive room (internally labeled as Room 5). Room 1 contains single screen with native resolution `6130 * 2160 px`.  For realtime applications use `3065 * 1080 px`. Room 1 screen is also served from Pixera media server from the same PC as Room 5. 
